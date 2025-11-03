@@ -18,6 +18,8 @@ namespace Foca.SerpApiDuckDuckGo.Ui
         private System.Windows.Forms.NumericUpDown numMaxPages;
         private System.Windows.Forms.Label lblDelayPages;
         private System.Windows.Forms.NumericUpDown numDelayPages;
+        private System.Windows.Forms.Label lblMaxRequests;
+        private System.Windows.Forms.NumericUpDown numMaxRequests;
 
         protected override void Dispose(bool disposing)
         {
@@ -46,10 +48,13 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.numMaxPages = new System.Windows.Forms.NumericUpDown();
             this.lblDelayPages = new System.Windows.Forms.Label();
             this.numDelayPages = new System.Windows.Forms.NumericUpDown();
+            this.lblMaxRequests = new System.Windows.Forms.Label();
+            this.numMaxRequests = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.numMinInurl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxResults)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxPages)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numDelayPages)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numMaxRequests)).BeginInit();
             this.SuspendLayout();
             // lblMinInurl
             // 
@@ -160,6 +165,32 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             0,
             0});
             // 
+            // lblMaxRequests
+            // 
+            this.lblMaxRequests.AutoSize = true;
+            this.lblMaxRequests.Location = new System.Drawing.Point(12, 123);
+            this.lblMaxRequests.Name = "lblMaxRequests";
+            this.lblMaxRequests.Size = new System.Drawing.Size(169, 13);
+            this.lblMaxRequests.TabIndex = 14;
+            this.lblMaxRequests.Text = "Máx. peticiones (0 = ilimitado):";
+            // 
+            // numMaxRequests
+            // 
+            this.numMaxRequests.Location = new System.Drawing.Point(184, 121);
+            this.numMaxRequests.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.numMaxRequests.Name = "numMaxRequests";
+            this.numMaxRequests.Size = new System.Drawing.Size(90, 20);
+            this.numMaxRequests.TabIndex = 15;
+            this.numMaxRequests.Value = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            // 
             // lblApiKey
             // 
             this.lblApiKey.AutoSize = true;
@@ -200,8 +231,8 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGuardar.Location = new System.Drawing.Point(432, 79);
+            this.btnGuardar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnGuardar.Location = new System.Drawing.Point(12, 140);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(75, 23);
             this.btnGuardar.TabIndex = 4;
@@ -211,8 +242,8 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             // 
             // btnCancelar
             // 
-            this.btnCancelar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancelar.Location = new System.Drawing.Point(513, 79);
+            this.btnCancelar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCancelar.Location = new System.Drawing.Point(93, 140);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(75, 23);
             this.btnCancelar.TabIndex = 5;
@@ -224,7 +255,9 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(600, 170);
+            this.ClientSize = new System.Drawing.Size(600, 200);
+            this.Controls.Add(this.numMaxRequests);
+            this.Controls.Add(this.lblMaxRequests);
             this.Controls.Add(this.numDelayPages);
             this.Controls.Add(this.lblDelayPages);
             this.Controls.Add(this.numMaxPages);
@@ -250,6 +283,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             ((System.ComponentModel.ISupportInitialize)(this.numMaxResults)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxPages)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numDelayPages)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numMaxRequests)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
         }

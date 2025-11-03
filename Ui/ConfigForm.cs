@@ -29,6 +29,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                 try { numMaxResults.Value = Math.Max(0, Math.Min(1000000, cfg.MaxResults)); } catch { }
                 try { numMaxPages.Value = Math.Max(0, Math.Min(10000, cfg.MaxPagesPerSearch)); } catch { }
                 try { numDelayPages.Value = Math.Max(0, Math.Min(60000, cfg.DelayBetweenPagesMs)); } catch { }
+                try { numMaxRequests.Value = Math.Max(0, Math.Min(100000, cfg.MaxRequestsPerSearch)); } catch { }
             }
             toolTip1.SetToolTip(lblPriority, "La variable de entorno SERPAPI_API_KEY tiene prioridad sobre config.json en %APPDATA%\\FOCA\\Plugins\\SerpApiDuckDuckGo\\config.json");
         }
@@ -87,7 +88,8 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                     MinInurlSegmentLength = (int)numMinInurl.Value,
                     MaxResults = (int)numMaxResults.Value,
                     MaxPagesPerSearch = (int)numMaxPages.Value,
-                    DelayBetweenPagesMs = (int)numDelayPages.Value
+                    DelayBetweenPagesMs = (int)numDelayPages.Value,
+                    MaxRequestsPerSearch = (int)numMaxRequests.Value
                 });
                 MessageBox.Show("Configuración guardada correctamente.", "Configuración de SerpApi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.DialogResult = DialogResult.OK;

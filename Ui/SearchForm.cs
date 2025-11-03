@@ -78,6 +78,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                 int maxResults = 0; // 0 = ilimitado
                 int maxPages = 0;
                 int delayMs = 0;
+                int maxRequests = 0;
                 try
                 {
                     var cfg = Foca.SerpApiDuckDuckGo.Config.SerpApiConfigStore.Load();
@@ -86,6 +87,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                         maxResults = cfg.MaxResults;
                         maxPages = cfg.MaxPagesPerSearch;
                         delayMs = cfg.DelayBetweenPagesMs;
+                        maxRequests = cfg.MaxRequestsPerSearch;
                     }
                 }
                 catch { }
@@ -93,6 +95,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                 var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 using (var client = new SerpApiClient())
                 {
+                    int requests = 0;
                     for (int page = 0; (maxResults == 0 || _results.Count < maxResults) && (maxPages == 0 || page < maxPages); page++)
                     {
                         ct.ThrowIfCancellationRequested();
@@ -101,20 +104,44 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                         {
                             // Google pagina con start=0,10,20...
                             int start = page * 10;
-                            // Usar dominio local y 10 resultados por página
-                            res = await client.SearchGoogleAsync(apiKey, query, null, null, start, "google.es", 10, ct);
+                            // Mapeo de kl -> hl/gl si procede
+                            string hl = null, gl = null;
+                            var klNorm = (txtKl.Text ?? "").Trim();
+                            if (klNorm.Length >= 4 && klNorm.Contains("-"))
+                            {
+                                var parts = klNorm.Split('-');
+                                hl = parts[0].ToLowerInvariant();
+                                gl = parts[1].ToLowerInvariant();
+                            }
+                            var host = QueryBuilder.NormalizeToDomain(domain);
+                            var gDomain = (cmbGoogleDomain.SelectedItem as string) ?? "google.es";
+                            string asFiletype = null;
+                            if (selectedExts != null && selectedExts.Length == 1)
+                                asFiletype = selectedExts[0];
+                            res = await client.SearchGoogleAsync(apiKey, query, hl, gl, start, gDomain, 100, host, ct, asFiletype);
                         }
                         else
                         {
                             res = await client.SearchAsync(apiKey, query, kl, page, ct);
                         }
                         var ok = res.ok; var error = res.error; var json = res.json;
+                        System.Diagnostics.Debug.WriteLine($"[SerpApi] engine={engine} page={page} ok={ok} req={requests}");
+                        requests++;
+                        if (maxRequests > 0 && requests >= maxRequests) break;
                         if (!ok)
                         {
                             MessageBox.Show(error ?? "Error de búsqueda", "Búsqueda avanzada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             break;
                         }
                         var pageLinks = ResultMapper.ExtractLinks(json).ToList();
+                        bool isLastPage = false;
+                        try
+                        {
+                            var jobj = JObject.Parse(json);
+                            var next = jobj.SelectToken("serpapi_pagination.next") ?? jobj.SelectToken("serpapi_pagination.next_link");
+                            if (next == null) isLastPage = true;
+                        }
+                        catch { }
                         if (pageLinks.Count == 0) break; // la API ya no devuelve más resultados
 
                         // Filtrar solo por host exacto. La ruta (inurl:...) se usa para sesgar la búsqueda
@@ -136,8 +163,10 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                             }
                         }
                         lblCount.Text = _results.Count + " resultados";
+                        System.Diagnostics.Debug.WriteLine($"[SerpApi] added={addedThisPage} total={_results.Count} last={isLastPage}");
                         // No asumimos tamaño de página fijo; continuamos hasta quedarnos sin resultados
                         if (addedThisPage == 0) break; // corta si no añade nada nuevo (evita bucles)
+                        if (isLastPage) break; // no hay siguiente página anunciado por SerpAPI
                         if (delayMs > 0) await Task.Delay(delayMs, ct);
                     }
                 }
@@ -220,6 +249,11 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                     }
                 }
             }
+        }
+
+        private void txtQueryPreview_DoubleClick(object sender, EventArgs e)
+        {
+            try { Clipboard.SetText(txtQueryPreview.Text ?? string.Empty); } catch { }
         }
 
         private void FinalizeFlowUI()

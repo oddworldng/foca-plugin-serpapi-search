@@ -20,6 +20,9 @@ namespace Foca.SerpApiDuckDuckGo.Ui
         private System.Windows.Forms.CheckBox chkRestrictPath;
         private System.Windows.Forms.Label lblEngine;
         private System.Windows.Forms.ComboBox cmbEngine;
+        private System.Windows.Forms.Label lblGoogleDomain;
+        private System.Windows.Forms.ComboBox cmbGoogleDomain;
+        private System.Windows.Forms.Label lblQuery;
 
         protected override void Dispose(bool disposing)
         {
@@ -49,6 +52,8 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.chkRestrictPath = new System.Windows.Forms.CheckBox();
             this.lblEngine = new System.Windows.Forms.Label();
             this.cmbEngine = new System.Windows.Forms.ComboBox();
+            this.lblGoogleDomain = new System.Windows.Forms.Label();
+            this.cmbGoogleDomain = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // lblRootUrl
@@ -190,6 +195,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.txtQueryPreview.ReadOnly = true;
             this.txtQueryPreview.Size = new System.Drawing.Size(554, 20);
             this.txtQueryPreview.TabIndex = 13;
+            this.txtQueryPreview.DoubleClick += new System.EventHandler(this.txtQueryPreview_DoubleClick);
             // 
             // chkRestrictPath
             // 
@@ -225,11 +231,45 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.cmbEngine.Size = new System.Drawing.Size(121, 21);
             this.cmbEngine.TabIndex = 16;
             // 
+            // lblGoogleDomain
+            // 
+            this.lblGoogleDomain.AutoSize = true;
+            this.lblGoogleDomain.Location = new System.Drawing.Point(515, 152);
+            this.lblGoogleDomain.Name = "lblGoogleDomain";
+            this.lblGoogleDomain.Size = new System.Drawing.Size(32, 13);
+            this.lblGoogleDomain.TabIndex = 17;
+            this.lblGoogleDomain.Text = "TLD:";
+            // 
+            // cmbGoogleDomain
+            // 
+            this.cmbGoogleDomain.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbGoogleDomain.FormattingEnabled = true;
+            this.cmbGoogleDomain.Items.AddRange(new object[] {
+            "google.es",
+            "google.com",
+            "google.fr",
+            "google.de"});
+            this.cmbGoogleDomain.Location = new System.Drawing.Point(553, 149);
+            this.cmbGoogleDomain.Name = "cmbGoogleDomain";
+            this.cmbGoogleDomain.Size = new System.Drawing.Size(91, 21);
+            this.cmbGoogleDomain.TabIndex = 18;
+            // lblQuery
+            // 
+            this.lblQuery.AutoSize = true;
+            this.lblQuery.Location = new System.Drawing.Point(12, 175);
+            this.lblQuery.Name = "lblQuery";
+            this.lblQuery.Size = new System.Drawing.Size(47, 13);
+            this.lblQuery.TabIndex = 19;
+            this.lblQuery.Text = "Consulta:";
+            // 
             // SearchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(656, 435);
+            this.Controls.Add(this.cmbGoogleDomain);
+            this.Controls.Add(this.lblGoogleDomain);
+            this.Controls.Add(this.lblQuery);
             this.Controls.Add(this.cmbEngine);
             this.Controls.Add(this.lblEngine);
             this.Controls.Add(this.chkRestrictPath);
@@ -253,6 +293,8 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Buscar documentos (SerpApi/DuckDuckGo)";
             this.Load += new System.EventHandler(this.SearchForm_Load);
+            this.AcceptButton = this.btnBuscar;
+            this.CancelButton = this.btnClose;
             this.ResumeLayout(false);
             this.PerformLayout();
         }

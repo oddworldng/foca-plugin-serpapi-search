@@ -16,6 +16,8 @@ namespace Foca.SerpApiDuckDuckGo.Config
         public int MaxPagesPerSearch { get; set; } = 10;
         // Retardo entre páginas en ms (para evitar 429). 0 = sin retardo
         public int DelayBetweenPagesMs { get; set; } = 0;
+        // Máximo de peticiones por búsqueda (0 = ilimitado)
+        public int MaxRequestsPerSearch { get; set; } = 0;
 
         public static string ResolveApiKey(Func<string> appConfigReader = null)
         {

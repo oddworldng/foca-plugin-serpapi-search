@@ -62,6 +62,7 @@ namespace Foca.SerpApiDuckDuckGo.Api
             if (!string.IsNullOrWhiteSpace(kl)) sb.Append("&kl=").Append(Uri.EscapeDataString(kl));
             // DuckDuckGo en SerpApi usa 'pageno' empezando en 1 para paginar
             if (page >= 0) sb.Append("&pageno=").Append(page + 1);
+            sb.Append("&device=desktop");
             sb.Append("&no_cache=true");
             sb.Append("&t=").Append(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             sb.Append("&api_key=").Append(Uri.EscapeDataString(apiKey));
@@ -70,7 +71,7 @@ namespace Foca.SerpApiDuckDuckGo.Api
             return (ok, err, jsonObj);
         }
 
-        public async Task<(bool ok, string error, string json)> SearchGoogleAsync(string apiKey, string query, string hl, string gl, int start, string googleDomain = null, int num = 10, CancellationToken ct = default(CancellationToken))
+        public async Task<(bool ok, string error, string json)> SearchGoogleAsync(string apiKey, string query, string hl, string gl, int start, string googleDomain = null, int num = 100, string asSiteSearchHost = null, CancellationToken ct = default(CancellationToken), string asFiletype = null)
         {
             if (string.IsNullOrWhiteSpace(apiKey)) return (false, "API Key no configurada", null);
             var sb = new StringBuilder("https://serpapi.com/search.json?engine=google");
@@ -80,6 +81,10 @@ namespace Foca.SerpApiDuckDuckGo.Api
             if (!string.IsNullOrWhiteSpace(googleDomain)) sb.Append("&google_domain=").Append(Uri.EscapeDataString(googleDomain));
             if (num > 0) sb.Append("&num=").Append(num);
             if (start > 0) sb.Append("&start=").Append(start); // 0,10,20,...
+            if (!string.IsNullOrWhiteSpace(asSiteSearchHost)) sb.Append("&as_sitesearch=").Append(Uri.EscapeDataString(asSiteSearchHost));
+            if (!string.IsNullOrWhiteSpace(asFiletype)) sb.Append("&as_filetype=").Append(Uri.EscapeDataString(asFiletype));
+            sb.Append("&filter=1");
+            sb.Append("&safe=off");
             sb.Append("&no_cache=true");
             sb.Append("&t=").Append(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             sb.Append("&api_key=").Append(Uri.EscapeDataString(apiKey));

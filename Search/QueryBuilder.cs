@@ -105,7 +105,7 @@ namespace Foca.SerpApiDuckDuckGo.Search
 
         public static string BuildGoogle(string domain, IEnumerable<string> extensions)
         {
-            // En Google el dork es similar: site:"host" + inurl:"seg" + filetype:ext
+            // En Google el dork es similar: site:"host" + inurl:"seg" + (filetype:...)
             return Build(domain, extensions);
         }
 
