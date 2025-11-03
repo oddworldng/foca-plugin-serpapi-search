@@ -110,6 +110,7 @@ namespace Foca.SerpApiSearch.Ui
             this.lblKl.Size = new System.Drawing.Size(74, 13);
             this.lblKl.TabIndex = 4;
             this.lblKl.Text = "Región (kl):";
+            this.lblKl.Visible = false;
             // 
             // txtKl
             // 
@@ -117,6 +118,7 @@ namespace Foca.SerpApiSearch.Ui
             this.txtKl.Name = "txtKl";
             this.txtKl.Size = new System.Drawing.Size(120, 20);
             this.txtKl.TabIndex = 5;
+            this.txtKl.Visible = false;
             // 
             // btnBuscar
             // 
@@ -135,14 +137,13 @@ namespace Foca.SerpApiSearch.Ui
             // 
             // lstResults
             // 
-            this.lstResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.lstResults.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstResults.FormattingEnabled = true;
             this.lstResults.IntegralHeight = false;
-            this.lstResults.Location = new System.Drawing.Point(15, 182);
+            this.lstResults.Location = new System.Drawing.Point(15, 264);
             this.lstResults.Name = "lstResults";
-            this.lstResults.Size = new System.Drawing.Size(629, 210);
+            this.lstResults.Size = new System.Drawing.Size(629, 141);
             this.lstResults.TabIndex = 7;
             // 
             // lblCount
@@ -219,7 +220,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             this.txtQueryPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtQueryPreview.Location = new System.Drawing.Point(90, 172);
+            this.txtQueryPreview.Location = new System.Drawing.Point(90, 206);
             this.txtQueryPreview.Name = "txtQueryPreview";
             this.txtQueryPreview.ReadOnly = true;
             this.txtQueryPreview.Multiline = true;
@@ -240,11 +241,13 @@ namespace Foca.SerpApiSearch.Ui
             this.chkRestrictPath.TabIndex = 14;
             this.chkRestrictPath.Text = "Restringir a ruta indicada";
             this.chkRestrictPath.UseVisualStyleBackColor = true;
+            this.chkRestrictPath.Visible = false;
             // 
             // lblEngine
             // 
             this.lblEngine.AutoSize = true;
-            this.lblEngine.Location = new System.Drawing.Point(330, 152);
+            // mover a la izquierda al ocultar Región/Restringir ruta y dejar margen superior
+            this.lblEngine.Location = new System.Drawing.Point(12, 176);
             this.lblEngine.Name = "lblEngine";
             this.lblEngine.Size = new System.Drawing.Size(52, 13);
             this.lblEngine.TabIndex = 15;
@@ -257,15 +260,18 @@ namespace Foca.SerpApiSearch.Ui
             this.cmbEngine.Items.AddRange(new object[] {
             "DuckDuckGo",
             "Google"});
-            this.cmbEngine.Location = new System.Drawing.Point(388, 149);
+            this.cmbEngine.Location = new System.Drawing.Point(90, 173);
             this.cmbEngine.Name = "cmbEngine";
             this.cmbEngine.Size = new System.Drawing.Size(121, 21);
             this.cmbEngine.TabIndex = 16;
+            this.cmbEngine.SelectedItem = "Google";
+            this.cmbEngine.SelectedIndexChanged += new System.EventHandler(this.cmbEngine_SelectedIndexChanged);
             // 
             // lblGoogleDomain
             // 
             this.lblGoogleDomain.AutoSize = true;
-            this.lblGoogleDomain.Location = new System.Drawing.Point(515, 152);
+            this.lblGoogleDomain.Location = new System.Drawing.Point(515, 176);
+            this.lblGoogleDomain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblGoogleDomain.Name = "lblGoogleDomain";
             this.lblGoogleDomain.Size = new System.Drawing.Size(32, 13);
             this.lblGoogleDomain.TabIndex = 17;
@@ -280,14 +286,16 @@ namespace Foca.SerpApiSearch.Ui
             "google.com",
             "google.fr",
             "google.de"});
-            this.cmbGoogleDomain.Location = new System.Drawing.Point(553, 149);
+            this.cmbGoogleDomain.Location = new System.Drawing.Point(553, 173);
+            this.cmbGoogleDomain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbGoogleDomain.Name = "cmbGoogleDomain";
             this.cmbGoogleDomain.Size = new System.Drawing.Size(91, 21);
             this.cmbGoogleDomain.TabIndex = 18;
+            this.cmbGoogleDomain.SelectedItem = "google.es";
             // lblQuery
             // 
             this.lblQuery.AutoSize = true;
-            this.lblQuery.Location = new System.Drawing.Point(12, 175);
+            this.lblQuery.Location = new System.Drawing.Point(12, 208);
             this.lblQuery.Name = "lblQuery";
             this.lblQuery.Size = new System.Drawing.Size(47, 13);
             this.lblQuery.TabIndex = 19;
@@ -297,6 +305,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(656, 435);
             // panelHeader (estilo FOCA)
             this.panelHeader.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
@@ -314,7 +323,7 @@ namespace Foca.SerpApiSearch.Ui
             // btnCopy (copiar consulta)
             // 
             this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCopy.Location = new System.Drawing.Point(554, 172);
+            this.btnCopy.Location = new System.Drawing.Point(554, 206);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.AutoSize = true;
             this.btnCopy.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -338,12 +347,10 @@ namespace Foca.SerpApiSearch.Ui
             this.Controls.Add(this.txtQueryPreview);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnExportar);
+            this.Controls.Add(this.lstResults);
             this.Controls.Add(this.btnIncorporarNuevo);
             this.Controls.Add(this.btnIncorporarExistente);
             this.Controls.Add(this.lblCount);
-            // ajustar results para dejar hueco a la consulta alta
-            this.lstResults.Location = new System.Drawing.Point(15, 232);
-            this.Controls.Add(this.lstResults);
             this.Controls.Add(this.btnBuscar);
             this.Controls.Add(this.txtKl);
             this.Controls.Add(this.lblKl);

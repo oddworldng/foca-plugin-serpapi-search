@@ -47,10 +47,106 @@ namespace Foca.SerpApiSearch.Ui
                 bool isDefaultChecked = string.Equals(ext, "pdf", StringComparison.OrdinalIgnoreCase);
                 chkListExtensions.Items.Add(ext, isDefaultChecked);
             }
+            // Selecciones por defecto del buscador
+            try { cmbEngine.SelectedItem = "Google"; } catch { }
+            try { cmbGoogleDomain.SelectedItem = "google.es"; } catch { }
+            UpdateEngineUi();
             btnIncorporarExistente.Enabled = false;
             btnIncorporarNuevo.Enabled = false;
             btnExportar.Enabled = false;
             btnClose.Visible = false;
+
+            // Icono: Incorporar a proyecto (img/add_to_project.png)
+            try
+            {
+                using (var stream = typeof(SearchForm).Assembly.GetManifestResourceStream("Foca.SerpApiSearch.img.add_to_project.png"))
+                {
+                    if (stream != null)
+                    {
+                        using (var img = System.Drawing.Image.FromStream(stream))
+                        {
+                            var sized = new System.Drawing.Bitmap(img, new System.Drawing.Size(16, 16));
+                            btnIncorporarExistente.Image = sized;
+                        }
+                        btnIncorporarExistente.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                        btnIncorporarExistente.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+                    }
+                }
+            }
+            catch { }
+
+            // Icono: Incorporar a nuevo proyecto (img/add_to_new_project.png)
+            try
+            {
+                using (var stream = typeof(SearchForm).Assembly.GetManifestResourceStream("Foca.SerpApiSearch.img.add_to_new_project.png"))
+                {
+                    if (stream != null)
+                    {
+                        using (var img = System.Drawing.Image.FromStream(stream))
+                        {
+                            var sized = new System.Drawing.Bitmap(img, new System.Drawing.Size(16, 16));
+                            btnIncorporarNuevo.Image = sized;
+                        }
+                        btnIncorporarNuevo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                        btnIncorporarNuevo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+                    }
+                }
+            }
+            catch { }
+
+            // Icono: Exportar CSV (img/export_csv.png)
+            try
+            {
+                using (var stream = typeof(SearchForm).Assembly.GetManifestResourceStream("Foca.SerpApiSearch.img.export_csv.png"))
+                {
+                    if (stream != null)
+                    {
+                        using (var img = System.Drawing.Image.FromStream(stream))
+                        {
+                            var sized = new System.Drawing.Bitmap(img, new System.Drawing.Size(16, 16));
+                            btnExportar.Image = sized;
+                        }
+                        btnExportar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                        btnExportar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+                    }
+                }
+            }
+            catch { }
+
+            // Icono: Copiar consulta (img/copy.png)
+            try
+            {
+                using (var stream = typeof(SearchForm).Assembly.GetManifestResourceStream("Foca.SerpApiSearch.img.copy.png"))
+                {
+                    if (stream != null)
+                    {
+                        using (var img = System.Drawing.Image.FromStream(stream))
+                        {
+                            var sized = new System.Drawing.Bitmap(img, new System.Drawing.Size(16, 16));
+                            btnCopy.Image = sized;
+                        }
+                        btnCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                        btnCopy.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void UpdateEngineUi()
+        {
+            try
+            {
+                bool isGoogle = string.Equals(cmbEngine.SelectedItem as string, "Google", StringComparison.OrdinalIgnoreCase);
+                lblGoogleDomain.Visible = isGoogle;
+                cmbGoogleDomain.Visible = isGoogle;
+            }
+            catch { }
+        }
+
+        private void cmbEngine_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateEngineUi();
         }
 
         private async void btnBuscar_Click(object sender, EventArgs e)

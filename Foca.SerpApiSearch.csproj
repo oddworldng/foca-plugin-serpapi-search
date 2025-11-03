@@ -47,6 +47,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="img\icon.png" Condition="Exists('img\icon.png')" />
+    <EmbeddedResource Include="img\save.png" Condition="Exists('img\save.png')" />
+    <EmbeddedResource Include="img\add_to_project.png" Condition="Exists('img\add_to_project.png')" />
+    <EmbeddedResource Include="img\add_to_new_project.png" Condition="Exists('img\add_to_new_project.png')" />
+    <EmbeddedResource Include="img\export_csv.png" Condition="Exists('img\export_csv.png')" />
+    <EmbeddedResource Include="img\copy.png" Condition="Exists('img\copy.png')" />
+    <EmbeddedResource Include="img\connection.png" Condition="Exists('img\connection.png')" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fody">
