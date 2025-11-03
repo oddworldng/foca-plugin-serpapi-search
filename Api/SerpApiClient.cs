@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace Foca.SerpApiDuckDuckGo.Api
+namespace Foca.SerpApiSearch.Api
 {
     /// <summary>
     /// Minimal SerpApi client for DuckDuckGo engine.
@@ -28,7 +28,7 @@ namespace Foca.SerpApiDuckDuckGo.Api
         public SerpApiClient()
         {
             _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("FOCA-SerpApiDuckDuckGo/1.0");
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("FOCA-SerpApiSearch/1.0");
 
             int rpm = 30;
             int timeoutSec = 20;

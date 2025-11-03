@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Foca.SerpApiDuckDuckGo.Db
+namespace Foca.SerpApiSearch.Db
 {
     /// <summary>
     /// Inserts URLs into FOCA DB, detecting FilesITems/UrlsItems and avoiding duplicates.

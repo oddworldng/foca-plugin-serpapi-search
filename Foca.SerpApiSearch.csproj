@@ -7,8 +7,8 @@
     <ProjectGuid>{3A9D6A2E-7F1F-4C8D-8C19-23E7E3A2B3B0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Foca.SerpApiDuckDuckGo</RootNamespace>
-    <AssemblyName>Foca.SerpApiDuckDuckGo</AssemblyName>
+    <RootNamespace>Foca.SerpApiSearch</RootNamespace>
+    <AssemblyName>Foca.SerpApiSearch</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -18,8 +18,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>plugin\SerpApiDuckDuckGo\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;FOCA_API</DefineConstants>
+    <OutputPath>plugin\SerpApiSearch\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,10 +27,14 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>plugin\SerpApiDuckDuckGo\</OutputPath>
-    <DefineConstants>TRACE;FOCA_API</DefineConstants>
+    <OutputPath>plugin\SerpApiSearch\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <!-- Añadir FOCA_API automáticamente si existe lib/PluginsAPI.dll -->
+  <PropertyGroup Condition="Exists('lib\\PluginsAPI.dll')">
+    <DefineConstants>$(DefineConstants);FOCA_API</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,6 +56,9 @@
     <PackageReference Include="Costura.Fody">
       <Version>5.7.0</Version>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup>
@@ -116,16 +123,15 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PluginsAPI">
-      <HintPath>foca-excel-export\lib\PluginsAPI.dll</HintPath>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PluginsAPI" Condition="Exists('lib\\PluginsAPI.dll')">
+      <HintPath>lib\PluginsAPI.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
 
 

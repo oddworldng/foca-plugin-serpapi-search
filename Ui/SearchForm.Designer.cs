@@ -1,4 +1,4 @@
-namespace Foca.SerpApiDuckDuckGo.Ui
+namespace Foca.SerpApiSearch.Ui
 {
     partial class SearchForm
     {
@@ -54,6 +54,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.cmbEngine = new System.Windows.Forms.ComboBox();
             this.lblGoogleDomain = new System.Windows.Forms.Label();
             this.cmbGoogleDomain = new System.Windows.Forms.ComboBox();
+            this.lblQuery = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblRootUrl
@@ -291,7 +292,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             this.MinimumSize = new System.Drawing.Size(600, 350);
             this.Name = "SearchForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Buscar documentos (SerpApi/DuckDuckGo)";
+            this.Text = "Buscar documentos (SerpApi)";
             this.Load += new System.EventHandler(this.SearchForm_Load);
             this.AcceptButton = this.btnBuscar;
             this.CancelButton = this.btnClose;

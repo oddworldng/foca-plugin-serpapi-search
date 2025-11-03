@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Foca.SerpApiDuckDuckGo.Search
+namespace Foca.SerpApiSearch.Search
 {
     /// <summary>
     /// Builds DuckDuckGo query with site:domain and filetype filters.
@@ -58,7 +58,7 @@ namespace Foca.SerpApiDuckDuckGo.Search
                 int minLen = 4;
                 try
                 {
-                    var loaded = Foca.SerpApiDuckDuckGo.Config.SerpApiConfigStore.Load();
+                    var loaded = Foca.SerpApiSearch.Config.SerpApiConfigStore.Load();
                     if (loaded != null) minLen = Math.Max(0, loaded.MinInurlSegmentLength);
                 }
                 catch { }

@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Foca.SerpApiDuckDuckGo.Config
+namespace Foca.SerpApiSearch.Config
 {
     /// <summary>
-    /// Persists SerpApi settings under %APPDATA%\FOCA\Plugins\SerpApiDuckDuckGo\config.json
+    /// Persists SerpApi settings under %APPDATA%\FOCA\Plugins\SerpApiSearch\config.json
     /// </summary>
     public static class SerpApiConfigStore
     {
@@ -14,7 +14,7 @@ namespace Foca.SerpApiDuckDuckGo.Config
             get
             {
                 var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                return Path.Combine(appdata, "FOCA", "Plugins", "SerpApiDuckDuckGo");
+                return Path.Combine(appdata, "FOCA", "Plugins", "SerpApiSearch");
             }
         }
 

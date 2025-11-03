@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Foca.SerpApiDuckDuckGo
+namespace Foca.SerpApiSearch
 {
     internal static class AssemblyResolver
     {
@@ -45,7 +45,7 @@ namespace Foca.SerpApiDuckDuckGo
 // usamos un tipo estático con constructor estático. El CLR garantiza que
 // el cctor se ejecuta antes del primer acceso a cualquier miembro del tipo
 // y también durante la reflexión de tipos en la mayoría de escenarios.
-namespace Foca.SerpApiDuckDuckGo
+namespace Foca.SerpApiSearch
 {
     internal static class EarlyBinder
     {
@@ -56,7 +56,7 @@ namespace Foca.SerpApiDuckDuckGo
                 AssemblyResolver.Init();
                 try
                 {
-                    var p = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FocaSerpApiDuckDuckGo.plugin.log");
+                    var p = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FocaSerpApiSearch.plugin.log");
                     System.IO.File.AppendAllText(p, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff ") + "Early binder executed" + Environment.NewLine);
                 }
                 catch { }

@@ -3,5 +3,5 @@ Plugin para FOCA que permite realizar una búsqueda ampliada de documentos media
 
 Resumen de uso rápido
 - Menú: Búsqueda avanzada → Configuración de SerpApi / Buscar.
-- Configura la API Key (prioridad: SERPAPI_API_KEY > %APPDATA%\FOCA\Plugins\SerpApiDuckDuckGo\config.json).
+- Configura la API Key (prioridad: SERPAPI_API_KEY > %APPDATA%\FOCA\Plugins\SerpApiSearch\config.json).
 - Busca por dominio y extensiones; luego incorpora resultados a proyectos o exporta CSV.

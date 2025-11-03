@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Foca.SerpApiDuckDuckGo.Api;
-using Foca.SerpApiDuckDuckGo.Config;
-using Foca.SerpApiDuckDuckGo.Db;
-using Foca.SerpApiDuckDuckGo.Search;
+using Foca.SerpApiSearch.Api;
+using Foca.SerpApiSearch.Config;
+using Foca.SerpApiSearch.Db;
+using Foca.SerpApiSearch.Search;
 using Newtonsoft.Json.Linq;
 
-namespace Foca.SerpApiDuckDuckGo.Ui
+namespace Foca.SerpApiSearch.Ui
 {
     public partial class SearchForm : Form
     {
@@ -72,7 +72,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                 var selectedExts = chkListExtensions.CheckedItems.Cast<object>().Select(o => o.ToString()).ToArray();
                 string engine = cmbEngine.SelectedItem as string ?? "DuckDuckGo";
                 var query = engine == "Google" ? QueryBuilder.BuildGoogle(domain, selectedExts) : QueryBuilder.Build(domain, selectedExts);
-                // Mostrar la consulta exacta que enviamos a DuckDuckGo/SerpApi
+                // Mostrar la consulta exacta que enviamos al buscador vía SerpApi
                 txtQueryPreview.Text = query;
                 var kl = txtKl.Text?.Trim();
                 int maxResults = 0; // 0 = ilimitado
@@ -81,7 +81,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                 int maxRequests = 0;
                 try
                 {
-                    var cfg = Foca.SerpApiDuckDuckGo.Config.SerpApiConfigStore.Load();
+                    var cfg = Foca.SerpApiSearch.Config.SerpApiConfigStore.Load();
                     if (cfg != null)
                     {
                         maxResults = cfg.MaxResults;
@@ -235,7 +235,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
             {
                 var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 sfd.Filter = "CSV (*.csv)|*.csv|Todos los archivos (*.*)|*.*";
-                sfd.FileName = $"{stamp}_SerpApiDuckDuckGo_results.csv";
+                sfd.FileName = $"{stamp}_SerpApiSearch_results.csv";
                 if (sfd.ShowDialog(this) == DialogResult.OK)
                 {
                     try

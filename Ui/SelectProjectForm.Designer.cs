@@ -1,4 +1,4 @@
-namespace Foca.SerpApiDuckDuckGo.Ui
+namespace Foca.SerpApiSearch.Ui
 {
     partial class SelectProjectForm
     {

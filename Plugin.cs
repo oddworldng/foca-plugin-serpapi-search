@@ -6,7 +6,7 @@ using PluginsAPI;
 using PluginsAPI.Elements;
 #endif
 
-namespace Foca.SerpApiDuckDuckGo
+namespace Foca.SerpApiSearch
 {
 	// Standalone interface (used when compiled without FOCA host)
 	public interface IFocaPlugin
@@ -18,10 +18,10 @@ namespace Foca.SerpApiDuckDuckGo
 		void Initialize();
 	}
 
-    public sealed class SerpApiDuckDuckGoPlugin : IFocaPlugin
+    public sealed class SerpApiSearchPlugin : IFocaPlugin
 	{
-		public string Name => "FOCA SerpApi DuckDuckGo";
-		public string Description => "Búsqueda avanzada de documentos vía SerpApi (DuckDuckGo)";
+		public string Name => "FOCA SerpApi Search";
+		public string Description => "Búsqueda avanzada de documentos vía SerpApi";
 		public string Author => "Andrés Nacimiento";
 		public string Version => "1.0.0";
 
@@ -37,13 +37,13 @@ namespace Foca.SerpApiDuckDuckGo
 namespace Foca
 {
 	using System.Drawing;
-	using Foca.SerpApiDuckDuckGo;
-	using Foca.SerpApiDuckDuckGo.Ui;
-	using Ui = Foca.SerpApiDuckDuckGo.Ui;
+    using Foca.SerpApiSearch;
+    using Foca.SerpApiSearch.Ui;
+    using Ui = Foca.SerpApiSearch.Ui;
 
 	internal static class PluginDiag
 	{
-		private static readonly string LogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FocaSerpApiDuckDuckGo.plugin.log");
+        private static readonly string LogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FocaSerpApiSearch.plugin.log");
 		public static void Log(string message)
 		{
 			try { File.AppendAllText(LogPath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff ") + message + Environment.NewLine); } catch { }
@@ -53,7 +53,7 @@ namespace Foca
     public class Plugin
 	{
 		private string _name = "Búsqueda avanzada";
-		private string _description = "Búsqueda de documentos (DuckDuckGo/SerpApi)";
+		private string _description = "Búsqueda de documentos (SerpApi)";
 		private readonly Export export;
 
 		public Export exportItems { get { return this.export; } }
@@ -76,8 +76,8 @@ namespace Foca
 			{
 				PluginDiag.Log("Plugin ctor start");
                 // Inicializar el resolver y forzar el cctor de EarlyBinder para asegurar el AssemblyResolve
-                Foca.SerpApiDuckDuckGo.AssemblyResolver.Init();
-                Foca.SerpApiDuckDuckGo.EarlyBinder.Touch();
+                Foca.SerpApiSearch.AssemblyResolver.Init();
+                Foca.SerpApiSearch.EarlyBinder.Touch();
 				this.export = new Export();
 
                 var hostPanel = new Panel { Dock = DockStyle.Fill, Visible = false };
@@ -177,16 +177,16 @@ namespace Foca
 				// Fallback: embedded resource
 				try
 				{
-					using (var stream = typeof(Plugin).Assembly.GetManifestResourceStream("Foca.SerpApiDuckDuckGo.img.icon.png"))
+                    using (var stream = typeof(Plugin).Assembly.GetManifestResourceStream("Foca.SerpApiSearch.img.icon.png"))
 					{
 						if (stream != null)
 						{
 							root.Image = Image.FromStream(stream);
-							PluginDiag.Log("Icon loaded from embedded resource: Foca.SerpApiDuckDuckGo.img.icon.png");
+                            PluginDiag.Log("Icon loaded from embedded resource: Foca.SerpApiSearch.img.icon.png");
 						}
 						else
 						{
-							PluginDiag.Log("Embedded icon resource not found: Foca.SerpApiDuckDuckGo.img.icon.png");
+                            PluginDiag.Log("Embedded icon resource not found: Foca.SerpApiSearch.img.icon.png");
 						}
 					}
 				}

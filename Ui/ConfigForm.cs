@@ -3,10 +3,10 @@ using System.Configuration;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Foca.SerpApiDuckDuckGo.Api;
-using Foca.SerpApiDuckDuckGo.Config;
+using Foca.SerpApiSearch.Api;
+using Foca.SerpApiSearch.Config;
 
-namespace Foca.SerpApiDuckDuckGo.Ui
+namespace Foca.SerpApiSearch.Ui
 {
     public partial class ConfigForm : Form
     {
@@ -31,7 +31,7 @@ namespace Foca.SerpApiDuckDuckGo.Ui
                 try { numDelayPages.Value = Math.Max(0, Math.Min(60000, cfg.DelayBetweenPagesMs)); } catch { }
                 try { numMaxRequests.Value = Math.Max(0, Math.Min(100000, cfg.MaxRequestsPerSearch)); } catch { }
             }
-            toolTip1.SetToolTip(lblPriority, "La variable de entorno SERPAPI_API_KEY tiene prioridad sobre config.json en %APPDATA%\\FOCA\\Plugins\\SerpApiDuckDuckGo\\config.json");
+            toolTip1.SetToolTip(lblPriority, "La variable de entorno SERPAPI_API_KEY tiene prioridad sobre config.json en %APPDATA%\\FOCA\\Plugins\\SerpApiSearch\\config.json");
         }
 
         private async void btnProbar_Click(object sender, EventArgs e)

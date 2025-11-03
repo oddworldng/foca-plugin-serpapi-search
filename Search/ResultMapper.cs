@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace Foca.SerpApiDuckDuckGo.Search
+namespace Foca.SerpApiSearch.Search
 {
     /// <summary>
-    /// Extracts links from SerpApi DuckDuckGo organic_results[].link
+    /// Extracts links from SerpApi organic_results[].link (DDG/Google)
     /// </summary>
     public static class ResultMapper
     {

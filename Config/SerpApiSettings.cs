@@ -1,6 +1,6 @@
 using System;
 
-namespace Foca.SerpApiDuckDuckGo.Config
+namespace Foca.SerpApiSearch.Config
 {
     /// <summary>
     /// SerpApi settings model. API key is read from env var first, then local store.

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foca.SerpApiDuckDuckGo.Ui
+namespace Foca.SerpApiSearch.Ui
 {
     public partial class SelectProjectForm : Form
     {

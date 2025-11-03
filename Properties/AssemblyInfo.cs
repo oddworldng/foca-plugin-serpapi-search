@@ -1,11 +1,11 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Foca.SerpApiDuckDuckGo")]
-[assembly: AssemblyDescription("FOCA plugin: Búsqueda avanzada vía SerpApi (DuckDuckGo)")]
+[assembly: AssemblyTitle("Foca.SerpApiSearch")]
+[assembly: AssemblyDescription("FOCA plugin: Búsqueda avanzada vía SerpApi")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FOCA Community")]
-[assembly: AssemblyProduct("Foca.SerpApiDuckDuckGo")]
+[assembly: AssemblyProduct("Foca.SerpApiSearch")]
 [assembly: AssemblyCopyright("Copyright © 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
