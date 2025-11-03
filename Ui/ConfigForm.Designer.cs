@@ -20,6 +20,9 @@ namespace Foca.SerpApiSearch.Ui
         private System.Windows.Forms.NumericUpDown numDelayPages;
         private System.Windows.Forms.Label lblMaxRequests;
         private System.Windows.Forms.NumericUpDown numMaxRequests;
+        private System.Windows.Forms.Panel panelHeader;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.Panel panelFooter;
 
         protected override void Dispose(bool disposing)
         {
@@ -59,7 +62,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblMinInurl
             // 
             this.lblMinInurl.AutoSize = true;
-            this.lblMinInurl.Location = new System.Drawing.Point(12, 71);
+            this.lblMinInurl.Location = new System.Drawing.Point(12, 106);
             this.lblMinInurl.Name = "lblMinInurl";
             this.lblMinInurl.Size = new System.Drawing.Size(132, 13);
             this.lblMinInurl.TabIndex = 6;
@@ -67,7 +70,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             // numMinInurl
             // 
-            this.numMinInurl.Location = new System.Drawing.Point(184, 69);
+            this.numMinInurl.Location = new System.Drawing.Point(184, 104);
             this.numMinInurl.Minimum = new decimal(new int[] {
             0,
             0,
@@ -90,7 +93,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblMaxResults
             // 
             this.lblMaxResults.AutoSize = true;
-            this.lblMaxResults.Location = new System.Drawing.Point(260, 71);
+            this.lblMaxResults.Location = new System.Drawing.Point(260, 106);
             this.lblMaxResults.Name = "lblMaxResults";
             this.lblMaxResults.Size = new System.Drawing.Size(168, 13);
             this.lblMaxResults.TabIndex = 8;
@@ -98,7 +101,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             // numMaxResults
             // 
-            this.numMaxResults.Location = new System.Drawing.Point(434, 69);
+            this.numMaxResults.Location = new System.Drawing.Point(434, 104);
             this.numMaxResults.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -116,7 +119,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblMaxPages
             // 
             this.lblMaxPages.AutoSize = true;
-            this.lblMaxPages.Location = new System.Drawing.Point(12, 97);
+            this.lblMaxPages.Location = new System.Drawing.Point(12, 132);
             this.lblMaxPages.Name = "lblMaxPages";
             this.lblMaxPages.Size = new System.Drawing.Size(150, 13);
             this.lblMaxPages.TabIndex = 10;
@@ -124,7 +127,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             // numMaxPages
             // 
-            this.numMaxPages.Location = new System.Drawing.Point(184, 95);
+            this.numMaxPages.Location = new System.Drawing.Point(184, 130);
             this.numMaxPages.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -142,7 +145,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblDelayPages
             // 
             this.lblDelayPages.AutoSize = true;
-            this.lblDelayPages.Location = new System.Drawing.Point(260, 97);
+            this.lblDelayPages.Location = new System.Drawing.Point(260, 132);
             this.lblDelayPages.Name = "lblDelayPages";
             this.lblDelayPages.Size = new System.Drawing.Size(171, 13);
             this.lblDelayPages.TabIndex = 12;
@@ -150,7 +153,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             // numDelayPages
             // 
-            this.numDelayPages.Location = new System.Drawing.Point(434, 95);
+            this.numDelayPages.Location = new System.Drawing.Point(434, 130);
             this.numDelayPages.Maximum = new decimal(new int[] {
             60000,
             0,
@@ -168,7 +171,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblMaxRequests
             // 
             this.lblMaxRequests.AutoSize = true;
-            this.lblMaxRequests.Location = new System.Drawing.Point(12, 123);
+            this.lblMaxRequests.Location = new System.Drawing.Point(12, 158);
             this.lblMaxRequests.Name = "lblMaxRequests";
             this.lblMaxRequests.Size = new System.Drawing.Size(169, 13);
             this.lblMaxRequests.TabIndex = 14;
@@ -176,14 +179,14 @@ namespace Foca.SerpApiSearch.Ui
             // 
             // numMaxRequests
             // 
-            this.numMaxRequests.Location = new System.Drawing.Point(184, 121);
+            this.numMaxRequests.Location = new System.Drawing.Point(184, 156);
             this.numMaxRequests.Maximum = new decimal(new int[] {
             100000,
             0,
             0,
             0});
             this.numMaxRequests.Name = "numMaxRequests";
-            this.numMaxRequests.Size = new System.Drawing.Size(90, 20);
+            this.numMaxRequests.Size = new System.Drawing.Size(60, 20);
             this.numMaxRequests.TabIndex = 15;
             this.numMaxRequests.Value = new decimal(new int[] {
             0,
@@ -194,7 +197,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblApiKey
             // 
             this.lblApiKey.AutoSize = true;
-            this.lblApiKey.Location = new System.Drawing.Point(12, 15);
+            this.lblApiKey.Location = new System.Drawing.Point(12, 50);
             this.lblApiKey.Name = "lblApiKey";
             this.lblApiKey.Size = new System.Drawing.Size(53, 13);
             this.lblApiKey.TabIndex = 0;
@@ -204,7 +207,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             this.txtApiKey.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtApiKey.Location = new System.Drawing.Point(90, 12);
+            this.txtApiKey.Location = new System.Drawing.Point(90, 47);
             this.txtApiKey.Name = "txtApiKey";
             this.txtApiKey.Size = new System.Drawing.Size(382, 20);
             this.txtApiKey.TabIndex = 1;
@@ -212,9 +215,13 @@ namespace Foca.SerpApiSearch.Ui
             // btnProbar
             // 
             this.btnProbar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnProbar.Location = new System.Drawing.Point(478, 10);
+            this.btnProbar.Location = new System.Drawing.Point(478, 45);
             this.btnProbar.Name = "btnProbar";
-            this.btnProbar.Size = new System.Drawing.Size(110, 23);
+            this.btnProbar.AutoSize = true;
+            this.btnProbar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnProbar.MinimumSize = new System.Drawing.Size(130, 28);
+            this.btnProbar.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnProbar.Size = new System.Drawing.Size(130, 28);
             this.btnProbar.TabIndex = 2;
             this.btnProbar.Text = "Probar conexión";
             this.btnProbar.UseVisualStyleBackColor = true;
@@ -223,7 +230,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblPriority
             // 
             this.lblPriority.AutoSize = true;
-            this.lblPriority.Location = new System.Drawing.Point(12, 45);
+            this.lblPriority.Location = new System.Drawing.Point(12, 80);
             this.lblPriority.Name = "lblPriority";
             this.lblPriority.Size = new System.Drawing.Size(35, 13);
             this.lblPriority.TabIndex = 3;
@@ -232,9 +239,13 @@ namespace Foca.SerpApiSearch.Ui
             // btnGuardar
             // 
             this.btnGuardar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnGuardar.Location = new System.Drawing.Point(12, 140);
+            this.btnGuardar.Location = new System.Drawing.Point(12, 162);
             this.btnGuardar.Name = "btnGuardar";
-            this.btnGuardar.Size = new System.Drawing.Size(75, 23);
+            this.btnGuardar.AutoSize = true;
+            this.btnGuardar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnGuardar.MinimumSize = new System.Drawing.Size(90, 28);
+            this.btnGuardar.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnGuardar.Size = new System.Drawing.Size(90, 28);
             this.btnGuardar.TabIndex = 4;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
@@ -243,9 +254,13 @@ namespace Foca.SerpApiSearch.Ui
             // btnCancelar
             // 
             this.btnCancelar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCancelar.Location = new System.Drawing.Point(93, 140);
+            this.btnCancelar.Location = new System.Drawing.Point(108, 162);
             this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(75, 23);
+            this.btnCancelar.AutoSize = true;
+            this.btnCancelar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnCancelar.MinimumSize = new System.Drawing.Size(90, 28);
+            this.btnCancelar.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnCancelar.Size = new System.Drawing.Size(90, 28);
             this.btnCancelar.TabIndex = 5;
             this.btnCancelar.Text = "Cancelar";
             this.btnCancelar.UseVisualStyleBackColor = true;
@@ -256,6 +271,25 @@ namespace Foca.SerpApiSearch.Ui
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 200);
+            // panelHeader (estilo FOCA)
+            this.panelHeader = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.panelHeader.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
+            this.panelHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelHeader.Height = 40;
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Text = "Configuración SerpApi";
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Location = new System.Drawing.Point(12, 11);
+            this.panelHeader.Controls.Add(this.lblTitle);
+            // panelFooter inferior
+            this.panelFooter = new System.Windows.Forms.Panel();
+            this.panelFooter.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
+            this.panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelFooter.Height = 10;
+            // Agregar primero para respetar docking
+            this.Controls.Add(this.panelFooter);
+            this.Controls.Add(this.panelHeader);
             this.Controls.Add(this.numMaxRequests);
             this.Controls.Add(this.lblMaxRequests);
             this.Controls.Add(this.numDelayPages);

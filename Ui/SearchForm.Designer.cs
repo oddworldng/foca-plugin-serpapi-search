@@ -23,6 +23,10 @@ namespace Foca.SerpApiSearch.Ui
         private System.Windows.Forms.Label lblGoogleDomain;
         private System.Windows.Forms.ComboBox cmbGoogleDomain;
         private System.Windows.Forms.Label lblQuery;
+        private System.Windows.Forms.Panel panelHeader;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.Panel panelFooter;
+        private System.Windows.Forms.Button btnCopy;
 
         protected override void Dispose(bool disposing)
         {
@@ -55,12 +59,16 @@ namespace Foca.SerpApiSearch.Ui
             this.lblGoogleDomain = new System.Windows.Forms.Label();
             this.cmbGoogleDomain = new System.Windows.Forms.ComboBox();
             this.lblQuery = new System.Windows.Forms.Label();
+            this.panelHeader = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.panelFooter = new System.Windows.Forms.Panel();
+            this.btnCopy = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblRootUrl
             // 
             this.lblRootUrl.AutoSize = true;
-            this.lblRootUrl.Location = new System.Drawing.Point(12, 15);
+            this.lblRootUrl.Location = new System.Drawing.Point(12, 50);
             this.lblRootUrl.Name = "lblRootUrl";
             this.lblRootUrl.Size = new System.Drawing.Size(55, 13);
             this.lblRootUrl.TabIndex = 0;
@@ -70,7 +78,7 @@ namespace Foca.SerpApiSearch.Ui
             // 
             this.txtRootUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtRootUrl.Location = new System.Drawing.Point(90, 12);
+            this.txtRootUrl.Location = new System.Drawing.Point(90, 47);
             this.txtRootUrl.Name = "txtRootUrl";
             this.txtRootUrl.Size = new System.Drawing.Size(458, 20);
             this.txtRootUrl.TabIndex = 1;
@@ -78,7 +86,7 @@ namespace Foca.SerpApiSearch.Ui
             // lblExtensions
             // 
             this.lblExtensions.AutoSize = true;
-            this.lblExtensions.Location = new System.Drawing.Point(12, 45);
+            this.lblExtensions.Location = new System.Drawing.Point(12, 75);
             this.lblExtensions.Name = "lblExtensions";
             this.lblExtensions.Size = new System.Drawing.Size(67, 13);
             this.lblExtensions.TabIndex = 2;
@@ -89,7 +97,7 @@ namespace Foca.SerpApiSearch.Ui
             this.chkListExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chkListExtensions.CheckOnClick = true;
-            this.chkListExtensions.Location = new System.Drawing.Point(90, 45);
+            this.chkListExtensions.Location = new System.Drawing.Point(90, 75);
             this.chkListExtensions.Name = "chkListExtensions";
             this.chkListExtensions.Size = new System.Drawing.Size(458, 94);
             this.chkListExtensions.TabIndex = 3;
@@ -115,7 +123,11 @@ namespace Foca.SerpApiSearch.Ui
             this.btnBuscar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBuscar.Location = new System.Drawing.Point(554, 10);
             this.btnBuscar.Name = "btnBuscar";
-            this.btnBuscar.Size = new System.Drawing.Size(90, 23);
+            this.btnBuscar.AutoSize = true;
+            this.btnBuscar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnBuscar.MinimumSize = new System.Drawing.Size(90, 28);
+            this.btnBuscar.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnBuscar.Size = new System.Drawing.Size(90, 28);
             this.btnBuscar.TabIndex = 6;
             this.btnBuscar.Text = "Buscar";
             this.btnBuscar.UseVisualStyleBackColor = true;
@@ -146,9 +158,13 @@ namespace Foca.SerpApiSearch.Ui
             // btnIncorporarExistente
             // 
             this.btnIncorporarExistente.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnIncorporarExistente.Location = new System.Drawing.Point(330, 400);
+            this.btnIncorporarExistente.Location = new System.Drawing.Point(330, 398);
             this.btnIncorporarExistente.Name = "btnIncorporarExistente";
-            this.btnIncorporarExistente.Size = new System.Drawing.Size(150, 23);
+            this.btnIncorporarExistente.AutoSize = true;
+            this.btnIncorporarExistente.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnIncorporarExistente.MinimumSize = new System.Drawing.Size(150, 28);
+            this.btnIncorporarExistente.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnIncorporarExistente.Size = new System.Drawing.Size(150, 28);
             this.btnIncorporarExistente.TabIndex = 9;
             this.btnIncorporarExistente.Text = "Incorporar a proyecto";
             this.btnIncorporarExistente.UseVisualStyleBackColor = true;
@@ -157,9 +173,13 @@ namespace Foca.SerpApiSearch.Ui
             // btnIncorporarNuevo
             // 
             this.btnIncorporarNuevo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnIncorporarNuevo.Location = new System.Drawing.Point(486, 400);
+            this.btnIncorporarNuevo.Location = new System.Drawing.Point(486, 398);
             this.btnIncorporarNuevo.Name = "btnIncorporarNuevo";
-            this.btnIncorporarNuevo.Size = new System.Drawing.Size(158, 23);
+            this.btnIncorporarNuevo.AutoSize = true;
+            this.btnIncorporarNuevo.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnIncorporarNuevo.MinimumSize = new System.Drawing.Size(170, 28);
+            this.btnIncorporarNuevo.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnIncorporarNuevo.Size = new System.Drawing.Size(170, 28);
             this.btnIncorporarNuevo.TabIndex = 10;
             this.btnIncorporarNuevo.Text = "Incorporar a nuevo proyecto";
             this.btnIncorporarNuevo.UseVisualStyleBackColor = true;
@@ -170,7 +190,11 @@ namespace Foca.SerpApiSearch.Ui
             this.btnExportar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnExportar.Location = new System.Drawing.Point(554, 39);
             this.btnExportar.Name = "btnExportar";
-            this.btnExportar.Size = new System.Drawing.Size(90, 23);
+            this.btnExportar.AutoSize = true;
+            this.btnExportar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnExportar.MinimumSize = new System.Drawing.Size(110, 28);
+            this.btnExportar.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnExportar.Size = new System.Drawing.Size(110, 28);
             this.btnExportar.TabIndex = 11;
             this.btnExportar.Text = "Exportar CSV";
             this.btnExportar.UseVisualStyleBackColor = true;
@@ -179,9 +203,13 @@ namespace Foca.SerpApiSearch.Ui
             // btnClose
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Location = new System.Drawing.Point(561, 400);
+            this.btnClose.Location = new System.Drawing.Point(561, 398);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(83, 23);
+            this.btnClose.AutoSize = true;
+            this.btnClose.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnClose.MinimumSize = new System.Drawing.Size(90, 28);
+            this.btnClose.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnClose.Size = new System.Drawing.Size(90, 28);
             this.btnClose.TabIndex = 12;
             this.btnClose.Text = "Cerrar";
             this.btnClose.UseVisualStyleBackColor = true;
@@ -194,7 +222,9 @@ namespace Foca.SerpApiSearch.Ui
             this.txtQueryPreview.Location = new System.Drawing.Point(90, 172);
             this.txtQueryPreview.Name = "txtQueryPreview";
             this.txtQueryPreview.ReadOnly = true;
-            this.txtQueryPreview.Size = new System.Drawing.Size(554, 20);
+            this.txtQueryPreview.Multiline = true;
+            this.txtQueryPreview.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtQueryPreview.Size = new System.Drawing.Size(454, 44);
             this.txtQueryPreview.TabIndex = 13;
             this.txtQueryPreview.DoubleClick += new System.EventHandler(this.txtQueryPreview_DoubleClick);
             // 
@@ -268,9 +298,40 @@ namespace Foca.SerpApiSearch.Ui
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(656, 435);
+            // panelHeader (estilo FOCA)
+            this.panelHeader.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
+            this.panelHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelHeader.Height = 40;
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Text = "Búsqueda avanzada";
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Location = new System.Drawing.Point(12, 11);
+            this.panelHeader.Controls.Add(this.lblTitle);
+            // panelFooter (separador inferior)
+            this.panelFooter.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
+            this.panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelFooter.Height = 10;
+            // btnCopy (copiar consulta)
+            // 
+            this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCopy.Location = new System.Drawing.Point(554, 172);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.AutoSize = true;
+            this.btnCopy.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnCopy.MinimumSize = new System.Drawing.Size(90, 28);
+            this.btnCopy.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.btnCopy.Size = new System.Drawing.Size(90, 28);
+            this.btnCopy.TabIndex = 20;
+            this.btnCopy.Text = "Copiar";
+            this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // Agregar paneles primero para respetar docking
+            this.Controls.Add(this.panelFooter);
+            this.Controls.Add(this.panelHeader);
             this.Controls.Add(this.cmbGoogleDomain);
             this.Controls.Add(this.lblGoogleDomain);
             this.Controls.Add(this.lblQuery);
+            this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.cmbEngine);
             this.Controls.Add(this.lblEngine);
             this.Controls.Add(this.chkRestrictPath);
@@ -280,6 +341,8 @@ namespace Foca.SerpApiSearch.Ui
             this.Controls.Add(this.btnIncorporarNuevo);
             this.Controls.Add(this.btnIncorporarExistente);
             this.Controls.Add(this.lblCount);
+            // ajustar results para dejar hueco a la consulta alta
+            this.lstResults.Location = new System.Drawing.Point(15, 232);
             this.Controls.Add(this.lstResults);
             this.Controls.Add(this.btnBuscar);
             this.Controls.Add(this.txtKl);

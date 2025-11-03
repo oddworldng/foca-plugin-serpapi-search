@@ -41,8 +41,12 @@ namespace Foca.SerpApiSearch.Ui
             string kl = ConfigurationManager.AppSettings["DefaultRegionKl"] ?? "es-es";
             txtKl.Text = kl;
             chkListExtensions.Items.Clear();
-            var defaults = new[] { "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp" };
-            foreach (var ext in defaults) chkListExtensions.Items.Add(ext, true);
+            var all = new[] { "pdf", "doc", "docx", "xls", "xlsx", "ppt" };
+            foreach (var ext in all)
+            {
+                bool isDefaultChecked = string.Equals(ext, "pdf", StringComparison.OrdinalIgnoreCase);
+                chkListExtensions.Items.Add(ext, isDefaultChecked);
+            }
             btnIncorporarExistente.Enabled = false;
             btnIncorporarNuevo.Enabled = false;
             btnExportar.Enabled = false;
@@ -209,7 +213,8 @@ namespace Foca.SerpApiSearch.Ui
             if (_results.Count == 0) return;
             using (var dlg = new SelectProjectForm())
             {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
+                var r = this.Embedded ? dlg.ShowDialog() : dlg.ShowDialog(this);
+                if (r == DialogResult.OK)
                 {
                     var info = dlg.SelectedProject;
                     if (info == null) return;
@@ -227,7 +232,8 @@ namespace Foca.SerpApiSearch.Ui
             if (_results.Count == 0) return;
             using (var dlg = new NewProjectForm())
             {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
+                var r = this.Embedded ? dlg.ShowDialog() : dlg.ShowDialog(this);
+                if (r == DialogResult.OK)
                 {
                     var name = dlg.ProjectName;
                     var notes = dlg.ProjectNotes;
@@ -265,6 +271,11 @@ namespace Foca.SerpApiSearch.Ui
         }
 
         private void txtQueryPreview_DoubleClick(object sender, EventArgs e)
+        {
+            try { Clipboard.SetText(txtQueryPreview.Text ?? string.Empty); } catch { }
+        }
+
+        private void btnCopy_Click(object sender, EventArgs e)
         {
             try { Clipboard.SetText(txtQueryPreview.Text ?? string.Empty); } catch { }
         }
