@@ -10,6 +10,7 @@ namespace Foca.SerpApiSearch.Ui
 {
     public partial class ConfigForm : Form
     {
+        public bool Embedded { get; set; }
         public ConfigForm()
         {
             InitializeComponent();
@@ -17,6 +18,16 @@ namespace Foca.SerpApiSearch.Ui
 
         private void ConfigForm_Load(object sender, EventArgs e)
         {
+            // Ajustes para modo embebido en panel del host
+            if (Embedded)
+            {
+                try
+                {
+                    this.FormBorderStyle = FormBorderStyle.None;
+                    this.TopLevel = false;
+                }
+                catch { }
+            }
             var env = SerpApiSettings.ResolveApiKey();
             var local = SerpApiConfigStore.Load()?.SerpApiKey;
             txtApiKey.Text = string.IsNullOrWhiteSpace(env) ? local : env;

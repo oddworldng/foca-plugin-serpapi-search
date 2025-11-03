@@ -78,58 +78,30 @@ namespace Foca
                 // Inicializar el resolver y forzar el cctor de EarlyBinder para asegurar el AssemblyResolve
                 Foca.SerpApiSearch.AssemblyResolver.Init();
                 Foca.SerpApiSearch.EarlyBinder.Touch();
-				this.export = new Export();
+                this.export = new Export();
 
                 var hostPanel = new Panel { Dock = DockStyle.Fill, Visible = false };
                 var pluginPanel = new PluginPanel(hostPanel, false);
                 this.export.Add(pluginPanel);
-				PluginDiag.Log("PluginPanel added");
+                PluginDiag.Log("PluginPanel added");
 
-				var root = new ToolStripMenuItem(this._name);
+                // Cargar UI integrada en el panel (estilo iframe)
+                var main = new Ui.MainControl { Dock = DockStyle.Fill };
+                hostPanel.Controls.Add(main);
+                hostPanel.Visible = true;
 
-				// Cargar icono si existe (opcional)
-				TryLoadIcon(root);
+                var root = new ToolStripMenuItem(this._name);
 
-                // Submenú Configuración
-                var miConfig = new ToolStripMenuItem("Configuración");
-				miConfig.Click += (s, e) =>
-				{
-					try
-					{
-						using (var dlg = new Ui.ConfigForm())
-						{
-							dlg.ShowDialog();
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show($"Error al abrir 'Configuración de SerpApi': {ex.Message}",
-							"Búsqueda avanzada", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-				};
+                // Cargar icono si existe (opcional)
+                TryLoadIcon(root);
 
-				// Submenú Buscar
-                var miBuscar = new ToolStripMenuItem("Buscar");
-				miBuscar.Click += (s, e) =>
-				{
-					try
-					{
-						using (var dlg = new Ui.SearchForm())
-						{
-							dlg.ShowDialog();
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show($"Error al abrir 'Buscar': {ex.Message}",
-							"Búsqueda avanzada", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-				};
+                // Asegurar que al hacer clic se muestre nuestro panel embebido
+                root.Click += (s, e) =>
+                {
+                    try { hostPanel.Visible = true; hostPanel.BringToFront(); } catch { }
+                };
 
-				root.DropDownItems.Add(miConfig);
-				root.DropDownItems.Add(miBuscar);
-
-				var pluginMenu = new PluginToolStripMenuItem(root);
+                var pluginMenu = new PluginToolStripMenuItem(root);
 				this.export.Add(pluginMenu);
 				PluginDiag.Log("Menu added");
             }

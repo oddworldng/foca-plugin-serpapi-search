@@ -15,6 +15,7 @@ namespace Foca.SerpApiSearch.Ui
 {
     public partial class SearchForm : Form
     {
+        public bool Embedded { get; set; }
         private CancellationTokenSource _cts;
         private List<string> _results = new List<string>();
 
@@ -25,6 +26,18 @@ namespace Foca.SerpApiSearch.Ui
 
         private void SearchForm_Load(object sender, EventArgs e)
         {
+            // Ajustes para modo embebido en panel del host
+            if (Embedded)
+            {
+                try
+                {
+                    this.FormBorderStyle = FormBorderStyle.None;
+                    this.TopLevel = false;
+                    this.btnClose.Visible = false;
+                    this.CancelButton = null;
+                }
+                catch { }
+            }
             string kl = ConfigurationManager.AppSettings["DefaultRegionKl"] ?? "es-es";
             txtKl.Text = kl;
             chkListExtensions.Items.Clear();

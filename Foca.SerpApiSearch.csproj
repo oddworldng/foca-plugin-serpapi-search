@@ -68,8 +68,8 @@
     <RemoveDir Directories="$(OutDir)lib" Condition="Exists('$(OutDir)lib')" />
   </Target>
   <!-- No copiar dependencias: Costura incrusta todo en el DLL final -->
-  <!-- Salida limpia en Release: solo el DLL del plugin (y PluginsAPI si existiera) -->
-  <Target Name="PruneReleaseOutputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
+  <!-- Salida limpia en cualquier configuración: dejar solo el DLL del plugin (y PluginsAPI si existiera) -->
+  <Target Name="PruneOutputs" AfterTargets="Build">
     <ItemGroup>
       <FilesToDelete Include="$(OutDir)$(AssemblyName).pdb;$(OutDir)$(AssemblyName).dll.config;$(OutDir)*.xml" />
       <ExtraDlls Include="$(OutDir)*.dll" Exclude="$(OutDir)$(AssemblyName).dll;$(OutDir)PluginsAPI.dll" />
@@ -103,6 +103,7 @@
     <Compile Include="Ui\SearchForm.Designer.cs">
       <DependentUpon>SearchForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ui\MainControl.cs" />
     <Compile Include="Ui\SelectProjectForm.cs">
       <SubType>Form</SubType>
     </Compile>
