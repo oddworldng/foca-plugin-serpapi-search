@@ -32,8 +32,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <!-- Añadir FOCA_API automáticamente si existe lib/PluginsAPI.dll -->
-  <PropertyGroup Condition="Exists('lib\\PluginsAPI.dll')">
+  <!-- Añadir FOCA_API automáticamente si existe PluginsAPI en lib/ o en FOCA/Plugins Release/ -->
+  <PropertyGroup Condition="Exists('lib\\PluginsAPI.dll') Or Exists('FOCA\\Plugins Release\\PluginsAPI.dll')">
     <DefineConstants>$(DefineConstants);FOCA_API</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -62,19 +62,22 @@
     </PackageReference>
   </ItemGroup>
   <PropertyGroup>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <Target Name="RemoveLibFolder" AfterTargets="Build">
     <RemoveDir Directories="$(OutDir)lib" Condition="Exists('$(OutDir)lib')" />
   </Target>
   <!-- No copiar dependencias: Costura incrusta todo en el DLL final -->
-  <!-- Dejar salida totalmente limpia en Release: solo el DLL del plugin -->
-  <Target Name="PruneOutputs" AfterTargets="Build">
+  <!-- Salida limpia en Release: solo el DLL del plugin (y PluginsAPI si existiera) -->
+  <Target Name="PruneReleaseOutputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
     <ItemGroup>
-      <Keep Include="$(OutDir)$(AssemblyName).dll" />
-      <FilesToDelete Include="$(OutDir)*.pdb;$(OutDir)*.dll.config;$(OutDir)*.xml" />
+      <FilesToDelete Include="$(OutDir)$(AssemblyName).pdb;$(OutDir)$(AssemblyName).dll.config;$(OutDir)*.xml" />
+      <ExtraDlls Include="$(OutDir)*.dll" Exclude="$(OutDir)$(AssemblyName).dll;$(OutDir)PluginsAPI.dll" />
+      <PdbFiles Include="$(OutDir)*.pdb" />
     </ItemGroup>
     <Delete Files="@(FilesToDelete)" ContinueOnError="true" />
+    <Delete Files="@(ExtraDlls)" ContinueOnError="true" />
+    <Delete Files="@(PdbFiles)" ContinueOnError="true" />
   </Target>
   <!-- Sin copias manuales: Costura incrusta dependencias en el DLL -->
   <!-- No copiamos Newtonsoft.Json; Costura lo incrusta en el DLL del plugin -->
@@ -127,6 +130,10 @@
   <ItemGroup>
     <Reference Include="PluginsAPI" Condition="Exists('lib\\PluginsAPI.dll')">
       <HintPath>lib\PluginsAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PluginsAPI" Condition="Exists('FOCA\\Plugins Release\\PluginsAPI.dll')">
+      <HintPath>FOCA\Plugins Release\PluginsAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

@@ -1,11 +1,5 @@
-#if FOCA_API
-using PluginsAPI;
-#endif
-
 namespace Foca.ExportImport
 {
-#if !FOCA_API
-    // Interfaz mínima para compilar fuera de FOCA. En FOCA usamos la del host.
     public interface IFocaPlugin
     {
         string Name { get; }
@@ -14,14 +8,8 @@ namespace Foca.ExportImport
         string Version { get; }
         void Initialize();
     }
-#endif
 
-    public sealed class FocaSerpApiSearchPlugin : 
-#if FOCA_API
-        PluginsAPI.IFocaPlugin
-#else
-        IFocaPlugin
-#endif
+    public sealed class FocaSerpApiSearchPlugin : IFocaPlugin
     {
         public string Name => "FOCA SerpApi Search";
         public string Description => "Búsqueda avanzada de documentos via SerpApi";

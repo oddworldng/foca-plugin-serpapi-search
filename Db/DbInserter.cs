@@ -111,27 +111,60 @@ namespace Foca.SerpApiSearch.Db
                 if ((int)await exists.ExecuteScalarAsync() == 0)
                     throw new InvalidOperationException("No se encontró la tabla 'Projects' en la BD de FOCA.");
 
-                // Detect columns
-                bool hasNotes;
-                using (var colCmd = new SqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Projects' AND COLUMN_NAME='Notes'", connection))
+                // Detect columns y restricciones mínimas (evitar NULL en columnas sin default)
+                bool hasNotes = false;
+                bool hasProjectState = false;
+                bool projectStateNotNullableNoDefault = false;
+                try
                 {
-                    hasNotes = (int)await colCmd.ExecuteScalarAsync() > 0;
+                    using (var cols = new SqlCommand("SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Projects'", connection))
+                    using (var r = await cols.ExecuteReaderAsync())
+                    {
+                        while (await r.ReadAsync())
+                        {
+                            var col = (r[0] as string) ?? string.Empty;
+                            var isNullable = string.Equals(r[1] as string, "YES", StringComparison.OrdinalIgnoreCase);
+                            var hasDefault = !(r[2] is DBNull);
+                            if (string.Equals(col, "Notes", StringComparison.OrdinalIgnoreCase)) hasNotes = true;
+                            if (string.Equals(col, "ProjectState", StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasProjectState = true;
+                                projectStateNotNullableNoDefault = !isNullable && !hasDefault;
+                            }
+                        }
+                    }
                 }
+                catch { }
 
-                SqlCommand insert;
+                // Construir INSERT dinámico con columnas soportadas
+                var columns = new System.Collections.Generic.List<string>();
+                var values = new System.Collections.Generic.List<string>();
+                var cmdTextPrefix = "INSERT INTO [dbo].[Projects] (";
+                var cmd = new SqlCommand();
+
+                columns.Add("[ProjectName]");
+                values.Add("@n");
+                cmd.Parameters.AddWithValue("@n", projectName ?? (object)DBNull.Value);
+
                 if (hasNotes)
                 {
-                    insert = new SqlCommand("INSERT INTO [dbo].[Projects] ([ProjectName],[Notes]) OUTPUT INSERTED.[Id] VALUES (@n,@no)", connection);
-                    insert.Parameters.AddWithValue("@n", projectName ?? (object)DBNull.Value);
-                    insert.Parameters.AddWithValue("@no", string.IsNullOrWhiteSpace(notes) ? (object)DBNull.Value : notes);
-                }
-                else
-                {
-                    insert = new SqlCommand("INSERT INTO [dbo].[Projects] ([ProjectName]) OUTPUT INSERTED.[Id] VALUES (@n)", connection);
-                    insert.Parameters.AddWithValue("@n", projectName ?? (object)DBNull.Value);
+                    columns.Add("[Notes]");
+                    values.Add("@no");
+                    cmd.Parameters.AddWithValue("@no", string.IsNullOrWhiteSpace(notes) ? (object)DBNull.Value : notes);
                 }
 
-                var id = await insert.ExecuteScalarAsync();
+                if (hasProjectState && projectStateNotNullableNoDefault)
+                {
+                    // FOCA usa un entero para estados; 0 suele ser válido (p.ej. "Nuevo").
+                    columns.Add("[ProjectState]");
+                    values.Add("@ps");
+                    cmd.Parameters.AddWithValue("@ps", 0);
+                }
+
+                cmd.CommandText = cmdTextPrefix + string.Join(",", columns) + ") OUTPUT INSERTED.[Id] VALUES (" + string.Join(",", values) + ")";
+                cmd.Connection = connection;
+
+                var id = await cmd.ExecuteScalarAsync();
                 return Convert.ToInt32(id);
             }
         }
