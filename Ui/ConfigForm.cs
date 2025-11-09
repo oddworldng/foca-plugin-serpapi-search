@@ -28,6 +28,7 @@ namespace Foca.SerpApiSearch.Ui
                 }
                 catch { }
             }
+            try { txtApiKey.UseSystemPasswordChar = true; } catch { }
             var env = SerpApiSettings.ResolveApiKey();
             var local = SerpApiConfigStore.Load()?.SerpApiKey;
             txtApiKey.Text = string.IsNullOrWhiteSpace(env) ? local : env;
@@ -43,6 +44,8 @@ namespace Foca.SerpApiSearch.Ui
                 try { numMaxPages.Value = Math.Max(0, Math.Min(10000, cfg.MaxPagesPerSearch)); } catch { }
                 try { numDelayPages.Value = Math.Max(0, Math.Min(60000, cfg.DelayBetweenPagesMs)); } catch { }
                 try { numMaxRequests.Value = Math.Max(0, Math.Min(100000, cfg.MaxRequestsPerSearch)); } catch { }
+                try { chkUseBingDomainFilter.Checked = cfg.UseBingDomainFilter; } catch { }
+                try { chkDebugMode.Checked = cfg.DebugMode; } catch { }
             }
             toolTip1.SetToolTip(lblPriority, "La variable de entorno SERPAPI_API_KEY tiene prioridad sobre config.json en %APPDATA%\\FOCA\\Plugins\\SerpApiSearch\\config.json");
 
@@ -116,6 +119,7 @@ namespace Foca.SerpApiSearch.Ui
         private async Task TestAsync()
         {
             btnProbar.Enabled = false;
+            try { lblTestStatus.Text = "Probando conexión..."; } catch { }
             try
             {
                 using (var client = new SerpApiClient())
@@ -123,22 +127,48 @@ namespace Foca.SerpApiSearch.Ui
                     var (ok, error, _) = await client.TestConnectionAsync(txtApiKey.Text);
                     if (ok)
                     {
+                        try { lblTestStatus.Text = "Conexión correcta."; } catch { }
                         MessageBox.Show("Conexión correcta con SerpApi.", "Configuración de SerpApi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
+                        try { lblTestStatus.Text = error ?? "No se pudo validar la API Key."; } catch { }
                         MessageBox.Show(error ?? "No se pudo validar la API Key.", "Configuración de SerpApi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
             catch (Exception ex)
             {
+                try { lblTestStatus.Text = $"Error: {ex.Message}"; } catch { }
                 MessageBox.Show($"Error al probar conexión: {ex.Message}", "Configuración de SerpApi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 btnProbar.Enabled = true;
             }
+        }
+
+        private void chkShowApiKey_CheckedChanged(object sender, EventArgs e)
+        {
+            try { txtApiKey.UseSystemPasswordChar = !chkShowApiKey.Checked; } catch { }
+        }
+
+        private void lnkOpenConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                var path = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "FOCA", "Plugins", "SerpApiSearch");
+                if (!System.IO.Directory.Exists(path)) System.IO.Directory.CreateDirectory(path);
+                System.Diagnostics.Process.Start("explorer.exe", path);
+            }
+            catch { }
+        }
+
+        private void lnkDocs_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try { System.Diagnostics.Process.Start("https://serpapi.com"); } catch { }
         }
 
         private void btnGuardar_Click(object sender, EventArgs e)
@@ -166,7 +196,9 @@ namespace Foca.SerpApiSearch.Ui
                     MaxResults = (int)numMaxResults.Value,
                     MaxPagesPerSearch = (int)numMaxPages.Value,
                     DelayBetweenPagesMs = (int)numDelayPages.Value,
-                    MaxRequestsPerSearch = (int)numMaxRequests.Value
+                    MaxRequestsPerSearch = (int)numMaxRequests.Value,
+                    DebugMode = chkDebugMode.Checked,
+                    UseBingDomainFilter = chkUseBingDomainFilter.Checked
                 });
                 MessageBox.Show("Configuración guardada correctamente.", "Configuración de SerpApi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (!Embedded)

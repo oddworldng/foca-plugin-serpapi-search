@@ -19,9 +19,15 @@ namespace Foca.SerpApiSearch.Ui
         private System.Windows.Forms.NumericUpDown numDelayPages;
         private System.Windows.Forms.Label lblMaxRequests;
         private System.Windows.Forms.NumericUpDown numMaxRequests;
+        private System.Windows.Forms.CheckBox chkDebugMode;
+        private System.Windows.Forms.CheckBox chkUseBingDomainFilter;
         private System.Windows.Forms.Panel panelHeader;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Panel panelFooter;
+        private System.Windows.Forms.CheckBox chkShowApiKey;
+        private System.Windows.Forms.Label lblTestStatus;
+        private System.Windows.Forms.LinkLabel lnkOpenConfig;
+        private System.Windows.Forms.LinkLabel lnkDocs;
 
         protected override void Dispose(bool disposing)
         {
@@ -51,6 +57,8 @@ namespace Foca.SerpApiSearch.Ui
             this.numDelayPages = new System.Windows.Forms.NumericUpDown();
             this.lblMaxRequests = new System.Windows.Forms.Label();
             this.numMaxRequests = new System.Windows.Forms.NumericUpDown();
+            this.chkDebugMode = new System.Windows.Forms.CheckBox();
+            this.chkUseBingDomainFilter = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numMinInurl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxResults)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxPages)).BeginInit();
@@ -194,6 +202,26 @@ namespace Foca.SerpApiSearch.Ui
             0,
             0});
             // 
+            // chkUseBingDomainFilter
+            // 
+            this.chkUseBingDomainFilter.AutoSize = true;
+            this.chkUseBingDomainFilter.Location = new System.Drawing.Point(15, 223);
+            this.chkUseBingDomainFilter.Name = "chkUseBingDomainFilter";
+            this.chkUseBingDomainFilter.Size = new System.Drawing.Size(209, 17);
+            this.chkUseBingDomainFilter.TabIndex = 16;
+            this.chkUseBingDomainFilter.Text = "Aplicar filtro domain= en búsquedas Bing";
+            this.chkUseBingDomainFilter.UseVisualStyleBackColor = true;
+            // 
+            // chkDebugMode
+            // 
+            this.chkDebugMode.AutoSize = true;
+            this.chkDebugMode.Location = new System.Drawing.Point(15, 246);
+            this.chkDebugMode.Name = "chkDebugMode";
+            this.chkDebugMode.Size = new System.Drawing.Size(131, 17);
+            this.chkDebugMode.TabIndex = 17;
+            this.chkDebugMode.Text = "Habilitar modo debug";
+            this.chkDebugMode.UseVisualStyleBackColor = true;
+            // 
             // lblApiKey
             // 
             this.lblApiKey.AutoSize = true;
@@ -226,6 +254,51 @@ namespace Foca.SerpApiSearch.Ui
             this.btnProbar.Text = "Probar conexión";
             this.btnProbar.UseVisualStyleBackColor = true;
             this.btnProbar.Click += new System.EventHandler(this.btnProbar_Click);
+            // 
+            // chkShowApiKey
+            // 
+            this.chkShowApiKey = new System.Windows.Forms.CheckBox();
+            this.chkShowApiKey.AutoSize = true;
+            this.chkShowApiKey.Location = new System.Drawing.Point(230, 77);
+            this.chkShowApiKey.Name = "chkShowApiKey";
+            this.chkShowApiKey.Size = new System.Drawing.Size(104, 17);
+            this.chkShowApiKey.TabIndex = 3;
+            this.chkShowApiKey.Text = "Mostrar API Key";
+            this.chkShowApiKey.UseVisualStyleBackColor = true;
+            this.chkShowApiKey.CheckedChanged += new System.EventHandler(this.chkShowApiKey_CheckedChanged);
+            // 
+            // lblTestStatus
+            // 
+            this.lblTestStatus = new System.Windows.Forms.Label();
+            this.lblTestStatus.AutoSize = true;
+            this.lblTestStatus.Location = new System.Drawing.Point(90, 105);
+            this.lblTestStatus.Name = "lblTestStatus";
+            this.lblTestStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblTestStatus.TabIndex = 5;
+            // 
+            // lnkOpenConfig
+            // 
+            this.lnkOpenConfig = new System.Windows.Forms.LinkLabel();
+            this.lnkOpenConfig.AutoSize = true;
+            this.lnkOpenConfig.Location = new System.Drawing.Point(380, 170);
+            this.lnkOpenConfig.Name = "lnkOpenConfig";
+            this.lnkOpenConfig.Size = new System.Drawing.Size(116, 13);
+            this.lnkOpenConfig.TabIndex = 100;
+            this.lnkOpenConfig.TabStop = true;
+            this.lnkOpenConfig.Text = "Abrir carpeta de config";
+            this.lnkOpenConfig.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkOpenConfig_LinkClicked);
+            // 
+            // lnkDocs
+            // 
+            this.lnkDocs = new System.Windows.Forms.LinkLabel();
+            this.lnkDocs.AutoSize = true;
+            this.lnkDocs.Location = new System.Drawing.Point(380, 190);
+            this.lnkDocs.Name = "lnkDocs";
+            this.lnkDocs.Size = new System.Drawing.Size(71, 13);
+            this.lnkDocs.TabIndex = 101;
+            this.lnkDocs.TabStop = true;
+            this.lnkDocs.Text = "Docs SerpApi";
+            this.lnkDocs.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkDocs_LinkClicked);
             // 
             // lblPriority
             // 
@@ -279,10 +352,16 @@ namespace Foca.SerpApiSearch.Ui
             // Agregar primero para respetar docking
             this.Controls.Add(this.panelFooter);
             this.Controls.Add(this.panelHeader);
+            this.Controls.Add(this.lnkDocs);
+            this.Controls.Add(this.lnkOpenConfig);
+            this.Controls.Add(this.lblTestStatus);
+            this.Controls.Add(this.chkShowApiKey);
             this.Controls.Add(this.numMaxRequests);
             this.Controls.Add(this.lblMaxRequests);
             this.Controls.Add(this.numDelayPages);
             this.Controls.Add(this.lblDelayPages);
+            this.Controls.Add(this.chkUseBingDomainFilter);
+            this.Controls.Add(this.chkDebugMode);
             this.Controls.Add(this.numMaxPages);
             this.Controls.Add(this.lblMaxPages);
             this.Controls.Add(this.numMinInurl);

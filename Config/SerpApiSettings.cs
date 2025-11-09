@@ -18,6 +18,8 @@ namespace Foca.SerpApiSearch.Config
         public int DelayBetweenPagesMs { get; set; } = 0;
         // Máximo de peticiones por búsqueda (0 = ilimitado)
         public int MaxRequestsPerSearch { get; set; } = 0;
+        public bool DebugMode { get; set; } = false;
+        public bool UseBingDomainFilter { get; set; } = true;
 
         public static string ResolveApiKey(Func<string> appConfigReader = null)
         {

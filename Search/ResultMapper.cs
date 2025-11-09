@@ -27,8 +27,30 @@ namespace Foca.SerpApiSearch.Search
             if (organic == null) yield break;
             foreach (var item in organic.OfType<JObject>())
             {
-                var link = item["link"]?.ToString();
+                var link = item["link"]?.ToString() ?? item["url"]?.ToString();
                 if (!string.IsNullOrWhiteSpace(link)) yield return link.Trim();
+            }
+        }
+
+        public static (IEnumerable<string> links, bool hasNext) ExtractLinksAndHasNext(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return (Enumerable.Empty<string>(), false);
+            try
+            {
+                var jobj = JObject.Parse(json);
+                var organic = jobj["organic_results"] as JArray;
+                var links = organic?.OfType<JObject>()
+                    .Select(o => ((o["link"]?.ToString() ?? o["url"]?.ToString()) ?? string.Empty).Trim())
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    ?? Enumerable.Empty<string>();
+                var next = jobj.SelectToken("serpapi_pagination.next")
+                    ?? jobj.SelectToken("serpapi_pagination.next_link")
+                    ?? jobj.SelectToken("pagination.next");
+                return (links, next != null);
+            }
+            catch
+            {
+                return (Enumerable.Empty<string>(), false);
             }
         }
     }

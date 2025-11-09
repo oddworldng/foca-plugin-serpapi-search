@@ -103,6 +103,37 @@ namespace Foca.SerpApiSearch.Search
             return string.Join(" ", parts);
         }
 
+        public static string BuildBing(string domain, IEnumerable<string> extensions)
+        {
+            var d = NormalizeToDomain(domain);
+            var list = (extensions ?? Enumerable.Empty<string>()).Where(e => !string.IsNullOrWhiteSpace(e))
+                .Select(e => e.Trim().ToLower()).Distinct().ToList();
+            var parts = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(d)) parts.Add($"site:\"{d}\"");
+
+            try
+            {
+                var segs = GetPathSegments(domain);
+                if (segs.Count > 0)
+                {
+                    foreach (var seg in segs)
+                    {
+                        var s = seg.Trim();
+                        if (s.Length > 0) parts.Add($"inurl:\"{s}\"");
+                    }
+                }
+            }
+            catch { }
+
+            if (list.Count > 0)
+            {
+                var types = string.Join(" OR ", list.Select(e => $"filetype:{e}"));
+                parts.Add(types);
+            }
+            return string.Join(" ", parts);
+        }
+
         public static string BuildGoogle(string domain, IEnumerable<string> extensions)
         {
             // En Google el dork es similar: site:"host" + inurl:"seg" + (filetype:...)
@@ -120,7 +151,17 @@ namespace Foca.SerpApiSearch.Search
             try
             {
                 var host = new Uri(url).Host;
-                return host.Equals(d, StringComparison.OrdinalIgnoreCase);
+                if (host.Equals(d, StringComparison.OrdinalIgnoreCase)) return true;
+                if (host.EndsWith("." + d, StringComparison.OrdinalIgnoreCase)) return true;
+
+                var dot = d.IndexOf('.');
+                if (dot > 0 && dot < d.Length - 1)
+                {
+                    var apex = d.Substring(dot + 1);
+                    if (host.Equals(apex, StringComparison.OrdinalIgnoreCase)) return true;
+                    if (host.EndsWith("." + apex, StringComparison.OrdinalIgnoreCase)) return true;
+                }
+                return false;
             }
             catch
             {
@@ -140,6 +181,24 @@ namespace Foca.SerpApiSearch.Search
                 foreach (var s in segments)
                 {
                     if (!path.Contains((s ?? string.Empty).ToLowerInvariant())) return false;
+                }
+                return true;
+            }
+            catch { return false; }
+        }
+
+        // Sobrecarga que asume que los segmentos ya están en minúsculas (preLowered = true)
+        public static bool UrlPathContainsSegments(string url, IList<string> segments, bool preLowered)
+        {
+            if (!preLowered) return UrlPathContainsSegments(url, segments);
+            if (segments == null || segments.Count == 0) return true;
+            try
+            {
+                var path = new Uri(url).AbsolutePath.ToLowerInvariant();
+                foreach (var s in segments)
+                {
+                    var needle = s ?? string.Empty;
+                    if (!path.Contains(needle)) return false;
                 }
                 return true;
             }

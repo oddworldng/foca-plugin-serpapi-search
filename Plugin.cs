@@ -4,6 +4,8 @@ using System.Windows.Forms;
 #if FOCA_API
 using PluginsAPI;
 using PluginsAPI.Elements;
+using System.Linq;
+using System.Reflection;
 #endif
 
 namespace Foca.SerpApiSearch
@@ -17,6 +19,164 @@ namespace Foca.SerpApiSearch
 		string Version { get; }
 		void Initialize();
 	}
+
+#if FOCA_API
+    internal static class PluginLogger
+    {
+        private static readonly object _progressLock = new object();
+        private static string _lastProgressMessage;
+        private static readonly Lazy<LoggerBinding> _binding = new Lazy<LoggerBinding>(ResolveBinding);
+        private static bool _debugEnabledCached = false;
+        private static DateTime _debugCacheTimestamp = DateTime.MinValue;
+
+        private sealed class LoggerBinding
+        {
+            public MethodInfo LogThis { get; set; }
+            public Type LogType { get; set; }
+            public Type ModuleEnum { get; set; }
+            public Type LogLevelEnum { get; set; }
+            public object ModuleWebSearch { get; set; }
+            public object LevelLow { get; set; }
+            public object LevelMedium { get; set; }
+            public object LevelHigh { get; set; }
+            public object LevelError { get; set; }
+        }
+
+        private static LoggerBinding ResolveBinding()
+        {
+            try
+            {
+                var focaAssembly = AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .FirstOrDefault(a => string.Equals(a.GetName().Name, "FOCA", StringComparison.OrdinalIgnoreCase));
+                if (focaAssembly == null) return null;
+
+                var logType = focaAssembly.GetType("FOCA.Log");
+                var moduleEnum = logType?.GetNestedType("ModuleType");
+                var logEnum = logType?.GetNestedType("LogType");
+                var programType = focaAssembly.GetType("FOCA.Program");
+                var logThis = programType?.GetMethod("LogThis", BindingFlags.Public | BindingFlags.Static);
+
+                if (logType == null || moduleEnum == null || logEnum == null || logThis == null)
+                    return null;
+
+                object ParseEnum(Type enumType, string name)
+                {
+                    try { return Enum.Parse(enumType, name, true); }
+                    catch { return null; }
+                }
+
+                var moduleWebSearch = ParseEnum(moduleEnum, "WebSearch");
+                var levelLow = ParseEnum(logEnum, "low");
+                var levelMedium = ParseEnum(logEnum, "medium");
+                var levelHigh = ParseEnum(logEnum, "high");
+                var levelError = ParseEnum(logEnum, "error");
+
+                if (moduleWebSearch == null || levelLow == null || levelMedium == null || levelHigh == null || levelError == null)
+                    return null;
+
+                return new LoggerBinding
+                {
+                    LogThis = logThis,
+                    LogType = logType,
+                    ModuleEnum = moduleEnum,
+                    LogLevelEnum = logEnum,
+                    ModuleWebSearch = moduleWebSearch,
+                    LevelLow = levelLow,
+                    LevelMedium = levelMedium,
+                    LevelHigh = levelHigh,
+                    LevelError = levelError
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static void Write(string message, object levelValue, string fallbackLevel)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+
+            var binding = _binding.Value;
+            if (binding != null)
+            {
+                try
+                {
+                    var logEntry = Activator.CreateInstance(binding.LogType, binding.ModuleWebSearch, message, levelValue);
+                    binding.LogThis.Invoke(null, new[] { logEntry });
+                    return;
+                }
+                catch
+                {
+                    // si falla, hacemos fallback
+                }
+            }
+
+            try { System.Diagnostics.Debug.WriteLine($"[SerpApiSearch][{fallbackLevel}] {message}"); } catch { }
+        }
+
+        private static bool IsDebugEnabled()
+        {
+            var now = DateTime.UtcNow;
+            if ((now - _debugCacheTimestamp).TotalSeconds > 5)
+            {
+                try
+                {
+                    _debugEnabledCached = Config.SerpApiConfigStore.Load()?.DebugMode ?? false;
+                }
+                catch
+                {
+                    _debugEnabledCached = false;
+                }
+                _debugCacheTimestamp = now;
+            }
+            return _debugEnabledCached;
+        }
+
+        public static void Info(string message) => Write(message, _binding.Value?.LevelMedium, "INFO");
+        public static void Debug(string message)
+        {
+            if (!IsDebugEnabled()) return;
+            Write(message, _binding.Value?.LevelLow, "DEBUG");
+        }
+        public static void Error(string message) => Write(message, _binding.Value?.LevelError, "ERROR");
+        public static void Success(string message) => Write(message, _binding.Value?.LevelHigh, "SUCCESS");
+
+        public static void Progress(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+            lock (_progressLock)
+            {
+                if (string.Equals(message, _lastProgressMessage, StringComparison.OrdinalIgnoreCase)) return;
+                _lastProgressMessage = message;
+            }
+            Debug(message);
+        }
+
+        public static void ResetProgressCache()
+        {
+            lock (_progressLock) { _lastProgressMessage = null; }
+            _debugCacheTimestamp = DateTime.MinValue;
+        }
+    }
+#else
+    internal static class PluginLogger
+    {
+        private static void Write(string level, string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+            try { System.Diagnostics.Debug.WriteLine($"[SerpApiSearch][{level}] {message}"); } catch { }
+        }
+
+        public static void Info(string message) => Write("INFO", message);
+        public static void Debug(string message) => Write("DEBUG", message);
+        public static void Error(string message) => Write("ERROR", message);
+        public static void Success(string message) => Write("SUCCESS", message);
+        public static void Progress(string message) => Debug(message);
+        public static void ResetProgressCache() { }
+    }
+#endif
 
     public sealed class SerpApiSearchPlugin : IFocaPlugin
 	{
