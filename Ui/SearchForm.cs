@@ -41,7 +41,6 @@ namespace Foca.SerpApiSearch.Ui
                 {
                     this.FormBorderStyle = FormBorderStyle.None;
                     this.TopLevel = false;
-                    this.btnClose.Visible = false;
                     this.CancelButton = null;
                 }
                 catch { }
@@ -95,7 +94,6 @@ namespace Foca.SerpApiSearch.Ui
             btnIncorporarExistente.Enabled = false;
             btnIncorporarNuevo.Enabled = false;
             btnExportar.Enabled = false;
-            btnClose.Visible = false;
 
             // Icono: Incorporar a proyecto (img/add_to_project.png)
             try
@@ -538,7 +536,6 @@ namespace Foca.SerpApiSearch.Ui
 
                 btnIncorporarNuevo.Visible = false;
                 btnExportar.Visible = false;
-                btnClose.Visible = false;
             }
             catch { }
         }
@@ -556,7 +553,6 @@ namespace Foca.SerpApiSearch.Ui
                 btnIncorporarNuevo.Enabled = _results.Count > 0;
 
                 btnExportar.Visible = true;
-                btnClose.Visible = false;
             }
             catch { }
         }
@@ -569,7 +565,6 @@ namespace Foca.SerpApiSearch.Ui
                 btnIncorporarExistente.Visible = false;
                 btnIncorporarNuevo.Visible = false;
                 btnExportar.Visible = false;
-                btnClose.Visible = true;
             }
             catch { }
         }
@@ -656,15 +651,11 @@ namespace Foca.SerpApiSearch.Ui
                 btnIncorporarExistente.Enabled = false;
                 btnIncorporarNuevo.Enabled = false;
                 btnExportar.Enabled = false;
-                btnClose.Visible = true;
             }
             catch { }
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            try { this.Close(); } catch { }
-        }
+
 
         private void UpdateBingStatus(string message)
         {
@@ -696,7 +687,7 @@ namespace Foca.SerpApiSearch.Ui
                 {
                     var inserter = new DbInserter();
                     var domain = QueryBuilder.NormalizeToDomain(txtRootUrl.Text);
-                    var newProjectId = await inserter.CreateProjectAsync(dlg.ProjectName, dlg.ProjectNotes, domain);
+                    var newProjectId = await inserter.CreateProjectAsync(dlg.ProjectName, null, domain, dlg.FolderPath);
                     var (inserted, duplicates) = await inserter.InsertUrlsAsync(newProjectId, _results.ToArray());
 
                     MessageBox.Show(

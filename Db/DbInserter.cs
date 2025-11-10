@@ -117,7 +117,7 @@ namespace Foca.SerpApiSearch.Db
             return null;
         }
 
-        public async Task<int> CreateProjectAsync(string projectName, string notes, string domain = null)
+        public async Task<int> CreateProjectAsync(string projectName, string notes, string domain = null, string folderToDownload = null)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -234,7 +234,7 @@ namespace Foca.SerpApiSearch.Db
                     columns.Add("[FolderToDownload]");
                     values.Add("@fd");
                     var defFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "FOCA Files");
-                    cmd.Parameters.AddWithValue("@fd", defFolder);
+                    cmd.Parameters.AddWithValue("@fd", string.IsNullOrWhiteSpace(folderToDownload) ? (object)defFolder : folderToDownload);
                 }
 
                 cmd.CommandText = cmdTextPrefix + string.Join(",", columns) + ") OUTPUT INSERTED.[Id] VALUES (" + string.Join(",", values) + ")";

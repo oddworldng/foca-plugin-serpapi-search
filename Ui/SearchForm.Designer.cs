@@ -15,7 +15,6 @@ namespace Foca.SerpApiSearch.Ui
         private System.Windows.Forms.Button btnIncorporarExistente;
         private System.Windows.Forms.Button btnIncorporarNuevo;
         private System.Windows.Forms.Button btnExportar;
-        private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.TextBox txtQueryPreview;
         private System.Windows.Forms.CheckBox chkRestrictPath;
         private System.Windows.Forms.Label lblEngine;
@@ -51,7 +50,6 @@ namespace Foca.SerpApiSearch.Ui
             this.btnIncorporarExistente = new System.Windows.Forms.Button();
             this.btnIncorporarNuevo = new System.Windows.Forms.Button();
             this.btnExportar = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
             this.txtQueryPreview = new System.Windows.Forms.TextBox();
             this.chkRestrictPath = new System.Windows.Forms.CheckBox();
             this.lblEngine = new System.Windows.Forms.Label();
@@ -201,21 +199,6 @@ namespace Foca.SerpApiSearch.Ui
             this.btnExportar.UseVisualStyleBackColor = true;
             this.btnExportar.Click += new System.EventHandler(this.btnExportar_Click);
             // 
-            // btnClose
-            // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Location = new System.Drawing.Point(561, 436);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.AutoSize = true;
-            this.btnClose.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnClose.MinimumSize = new System.Drawing.Size(90, 28);
-            this.btnClose.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.btnClose.Size = new System.Drawing.Size(90, 28);
-            this.btnClose.TabIndex = 12;
-            this.btnClose.Text = "Cerrar";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
             // txtQueryPreview
             // 
             this.txtQueryPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -347,7 +330,6 @@ namespace Foca.SerpApiSearch.Ui
             this.Controls.Add(this.lblEngine);
             this.Controls.Add(this.chkRestrictPath);
             this.Controls.Add(this.txtQueryPreview);
-            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnExportar);
             this.Controls.Add(this.lstResults);
             this.Controls.Add(this.btnIncorporarNuevo);
@@ -366,7 +348,6 @@ namespace Foca.SerpApiSearch.Ui
             this.Text = "Buscar documentos (SerpApi)";
             this.Load += new System.EventHandler(this.SearchForm_Load);
             this.AcceptButton = this.btnBuscar;
-            this.CancelButton = this.btnClose;
             this.ResumeLayout(false);
             this.PerformLayout();
         }
