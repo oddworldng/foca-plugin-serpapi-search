@@ -23,20 +23,36 @@ namespace Foca.SerpApiSearch.Db
         {
             try
             {
-                foreach (ConnectionStringSettings connectionString in ConfigurationManager.ConnectionStrings)
-                {
-                    string cs = connectionString.ConnectionString.ToLower();
-                    if (cs.Contains("data source") && cs.Contains("initial catalog"))
-                    {
-                        return connectionString.ConnectionString;
-                    }
-                }
-                var nonDefaultConnection = ConfigurationManager.ConnectionStrings
-                    .Cast<ConnectionStringSettings>()
-                    .FirstOrDefault(cs => !string.IsNullOrEmpty(cs.ConnectionString) &&
-                                         !cs.ConnectionString.Contains("LocalSqlServer") &&
-                                         !cs.ConnectionString.Contains("DefaultConnection"));
-                return nonDefaultConnection?.ConnectionString;
+				// 1) Si existe FocaContextDb (igual que FOCA), priorizarla
+#if FOCA_API
+				var fromFoca = ConfigurationManager.ConnectionStrings["FocaContextDb"]?.ConnectionString;
+				if (!string.IsNullOrWhiteSpace(fromFoca))
+					return fromFoca;
+#endif
+
+				// 2) Standalone: usar FocaContextDb si está presente en el config del plugin
+				var focaConn = ConfigurationManager.ConnectionStrings["FocaContextDb"]?.ConnectionString;
+				if (!string.IsNullOrWhiteSpace(focaConn))
+					return focaConn;
+
+				// 3) Heurística ampliada: primera que tenga server|data source e initial catalog
+				foreach (ConnectionStringSettings connectionString in ConfigurationManager.ConnectionStrings)
+				{
+					var cs = (connectionString?.ConnectionString ?? string.Empty).ToLowerInvariant();
+					if ((cs.Contains("data source") || cs.Contains("server")) && cs.Contains("initial catalog"))
+						return connectionString.ConnectionString;
+				}
+
+				// 4) Último recurso: cualquiera no por defecto
+				var nonDefaultConnection = ConfigurationManager.ConnectionStrings
+					.Cast<ConnectionStringSettings>()
+					.FirstOrDefault(cs => !string.IsNullOrEmpty(cs.ConnectionString) &&
+										 !cs.Name.Equals("LocalSqlServer", StringComparison.OrdinalIgnoreCase) &&
+										 !cs.Name.Equals("DefaultConnection", StringComparison.OrdinalIgnoreCase));
+				if (nonDefaultConnection != null)
+					return nonDefaultConnection.ConnectionString;
+
+				throw new InvalidOperationException("No se encontró ninguna cadena de conexión válida.");
             }
             catch (Exception ex)
             {
@@ -101,7 +117,7 @@ namespace Foca.SerpApiSearch.Db
             return null;
         }
 
-        public async Task<int> CreateProjectAsync(string projectName, string notes)
+        public async Task<int> CreateProjectAsync(string projectName, string notes, string domain = null)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -112,9 +128,13 @@ namespace Foca.SerpApiSearch.Db
                     throw new InvalidOperationException("No se encontró la tabla 'Projects' en la BD de FOCA.");
 
                 // Detect columns y restricciones mínimas (evitar NULL en columnas sin default)
-                bool hasNotes = false;
-                bool hasProjectState = false;
-                bool projectStateNotNullableNoDefault = false;
+                bool hasProjectNotes = false;
+                bool hasNotes = false; // compatibilidad con esquemas antiguos
+                bool hasProjectState = false, projectStateNotNullableNoDefault = false;
+                bool hasProjectSaveFile = false, projectSaveFileNotNullableNoDefault = false;
+                bool hasDomain = false, domainNotNullableNoDefault = false;
+                bool hasProjectDate = false, projectDateNotNullableNoDefault = false;
+                bool hasFolderToDownload = false, folderToDownloadNotNullableNoDefault = false;
                 try
                 {
                     using (var cols = new SqlCommand("SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Projects'", connection))
@@ -125,11 +145,32 @@ namespace Foca.SerpApiSearch.Db
                             var col = (r[0] as string) ?? string.Empty;
                             var isNullable = string.Equals(r[1] as string, "YES", StringComparison.OrdinalIgnoreCase);
                             var hasDefault = !(r[2] is DBNull);
+                            if (string.Equals(col, "ProjectNotes", StringComparison.OrdinalIgnoreCase)) hasProjectNotes = true;
                             if (string.Equals(col, "Notes", StringComparison.OrdinalIgnoreCase)) hasNotes = true;
                             if (string.Equals(col, "ProjectState", StringComparison.OrdinalIgnoreCase))
                             {
                                 hasProjectState = true;
                                 projectStateNotNullableNoDefault = !isNullable && !hasDefault;
+                            }
+                            if (string.Equals(col, "ProjectSaveFile", StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasProjectSaveFile = true;
+                                projectSaveFileNotNullableNoDefault = !isNullable && !hasDefault;
+                            }
+                            if (string.Equals(col, "Domain", StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasDomain = true;
+                                domainNotNullableNoDefault = !isNullable && !hasDefault;
+                            }
+                            if (string.Equals(col, "ProjectDate", StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasProjectDate = true;
+                                projectDateNotNullableNoDefault = !isNullable && !hasDefault;
+                            }
+                            if (string.Equals(col, "FolderToDownload", StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasFolderToDownload = true;
+                                folderToDownloadNotNullableNoDefault = !isNullable && !hasDefault;
                             }
                         }
                     }
@@ -146,19 +187,54 @@ namespace Foca.SerpApiSearch.Db
                 values.Add("@n");
                 cmd.Parameters.AddWithValue("@n", projectName ?? (object)DBNull.Value);
 
-                if (hasNotes)
+                if (hasProjectNotes)
+                {
+                    columns.Add("[ProjectNotes]");
+                    values.Add("@pn");
+                    cmd.Parameters.AddWithValue("@pn", string.IsNullOrWhiteSpace(notes) ? (object)DBNull.Value : notes);
+                }
+                else if (hasNotes)
                 {
                     columns.Add("[Notes]");
                     values.Add("@no");
                     cmd.Parameters.AddWithValue("@no", string.IsNullOrWhiteSpace(notes) ? (object)DBNull.Value : notes);
                 }
 
-                if (hasProjectState && projectStateNotNullableNoDefault)
+                if (hasDomain)
                 {
-                    // FOCA usa un entero para estados; 0 suele ser válido (p.ej. "Nuevo").
+                    columns.Add("[Domain]");
+                    values.Add("@d");
+                    cmd.Parameters.AddWithValue("@d", string.IsNullOrWhiteSpace(domain) ? (object)DBNull.Value : domain);
+                }
+
+                if (hasProjectState)
+                {
+                    // FOCA espera proyectos inicializados para habilitar flujos (InitializedUnsave = 1)
                     columns.Add("[ProjectState]");
                     values.Add("@ps");
-                    cmd.Parameters.AddWithValue("@ps", 0);
+                    cmd.Parameters.AddWithValue("@ps", 1);
+                }
+
+                if (hasProjectSaveFile)
+                {
+                    columns.Add("[ProjectSaveFile]");
+                    values.Add("@psf");
+                    cmd.Parameters.AddWithValue("@psf", 1);
+                }
+
+                if (hasProjectDate)
+                {
+                    columns.Add("[ProjectDate]");
+                    values.Add("@pdt");
+                    cmd.Parameters.AddWithValue("@pdt", DateTime.Now);
+                }
+
+                if (hasFolderToDownload)
+                {
+                    columns.Add("[FolderToDownload]");
+                    values.Add("@fd");
+                    var defFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "FOCA Files");
+                    cmd.Parameters.AddWithValue("@fd", defFolder);
                 }
 
                 cmd.CommandText = cmdTextPrefix + string.Join(",", columns) + ") OUTPUT INSERTED.[Id] VALUES (" + string.Join(",", values) + ")";
@@ -179,56 +255,90 @@ namespace Foca.SerpApiSearch.Db
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                // Detect optional file name column to enrich insertions
-                string fileNameCol = null;
-                try
+
+                // Detect columnas presentes y cuáles son NOT NULL sin default
+                var allColumns = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var required = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                using (var cmdCols = new SqlCommand("SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=@t", connection))
                 {
-                    var cmdCols = new SqlCommand("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=@t", connection);
                     cmdCols.Parameters.AddWithValue("@t", table);
                     using (var rr = await cmdCols.ExecuteReaderAsync())
                     {
                         while (await rr.ReadAsync())
                         {
                             var col = rr.GetString(0);
-                            if (string.Equals(col, "FileName", StringComparison.OrdinalIgnoreCase) ||
-                                string.Equals(col, "Filename", StringComparison.OrdinalIgnoreCase) ||
-                                string.Equals(col, "Name", StringComparison.OrdinalIgnoreCase))
+                            allColumns.Add(col);
+                            var isNullable = string.Equals((rr[1] as string) ?? "", "YES", StringComparison.OrdinalIgnoreCase);
+                            var hasDefault = !(rr[2] is DBNull);
+                            if (!isNullable && !hasDefault &&
+                                !string.Equals(col, "Id", StringComparison.OrdinalIgnoreCase) &&
+                                !string.Equals(col, urlCol, StringComparison.OrdinalIgnoreCase) &&
+                                !string.Equals(col, projectFk, StringComparison.OrdinalIgnoreCase))
                             {
-                                fileNameCol = col;
-                                break;
+                                required.Add(col);
                             }
                         }
                     }
                 }
-                catch { }
+
+                // Algunas columnas típicas en FilesITems
+                bool hasExt = allColumns.Contains("Ext"); // rellenar Ext siempre que exista la columna
+                bool needDownloaded = required.Contains("Downloaded");
+                bool needMetadataExtracted = required.Contains("MetadataExtracted");
+                bool needDate = required.Contains("Date");
+                bool needModifiedDate = required.Contains("ModifiedDate");
+                bool needSize = required.Contains("Size");
+                bool needDiarioAnalyzed = required.Contains("DiarioAnalyzed");
+                bool needDiarioPrediction = required.Contains("DiarioPrediction");
+                bool needPath = required.Contains("Path");
+
                 foreach (var url in distinct)
                 {
-                    string sql;
-                    if (!string.IsNullOrEmpty(fileNameCol))
-                    {
-                        sql = $@"IF NOT EXISTS (SELECT 1 FROM [dbo].[{table}] WHERE [{urlCol}]=@u AND [{projectFk}]=@p)
+                    // Construir INSERT dinámico con columnas estrictamente necesarias
+                    var cols = new System.Collections.Generic.List<string> { $"[{urlCol}]", $"[{projectFk}]" };
+                    var vals = new System.Collections.Generic.List<string> { "@u", "@p" };
+
+                    if (hasExt) { cols.Add("[Ext]"); vals.Add("@ext"); }
+                    if (needDownloaded) { cols.Add("[Downloaded]"); vals.Add("@dwn"); }
+                    if (needMetadataExtracted) { cols.Add("[MetadataExtracted]"); vals.Add("@mext"); }
+                    if (needDate) { cols.Add("[Date]"); vals.Add("@dt"); }
+                    if (needModifiedDate) { cols.Add("[ModifiedDate]"); vals.Add("@mdt"); }
+                    if (needSize) { cols.Add("[Size]"); vals.Add("@sz"); }
+                    if (needDiarioAnalyzed) { cols.Add("[DiarioAnalyzed]"); vals.Add("@dan"); }
+                    if (needDiarioPrediction) { cols.Add("[DiarioPrediction]"); vals.Add("@dpr"); }
+                    if (needPath) { cols.Add("[Path]"); vals.Add("@pth"); }
+
+                    string sql = $@"IF NOT EXISTS (SELECT 1 FROM [dbo].[{table}] WHERE [{urlCol}]=@u AND [{projectFk}]=@p)
 BEGIN
-    INSERT INTO [dbo].[{table}] ([{urlCol}],[{projectFk}],[{fileNameCol}]) VALUES (@u,@p,@fn)
+    INSERT INTO [dbo].[{table}] ({string.Join(",", cols)}) VALUES ({string.Join(",", vals)})
 END";
-                    }
-                    else
-                    {
-                        sql = $@"IF NOT EXISTS (SELECT 1 FROM [dbo].[{table}] WHERE [{urlCol}]=@u AND [{projectFk}]=@p)
-BEGIN
-    INSERT INTO [dbo].[{table}] ([{urlCol}],[{projectFk}]) VALUES (@u,@p)
-END";
-                    }
+
                     var cmd = new SqlCommand(sql, connection);
                     cmd.Parameters.AddWithValue("@u", url);
                     cmd.Parameters.AddWithValue("@p", projectId);
-                    if (!string.IsNullOrEmpty(fileNameCol))
+
+                    if (hasExt)
                     {
-                        var fn = ExtractFileName(url);
-                        if (string.IsNullOrWhiteSpace(fn))
-                            cmd.Parameters.AddWithValue("@fn", DBNull.Value);
-                        else
-                            cmd.Parameters.AddWithValue("@fn", fn);
+                        string ext = null;
+                        try
+                        {
+                            var u = new Uri(url, UriKind.Absolute);
+                            // Usar Path.GetExtension para incluir el punto (".pdf")
+                            ext = System.IO.Path.GetExtension(u.AbsolutePath);
+                            if (!string.IsNullOrEmpty(ext)) ext = ext.ToLowerInvariant();
+                        }
+                        catch { }
+                        cmd.Parameters.AddWithValue("@ext", (object)(string.IsNullOrEmpty(ext) ? ".bin" : ext));
                     }
+                    if (needDownloaded) cmd.Parameters.AddWithValue("@dwn", 0);
+                    if (needMetadataExtracted) cmd.Parameters.AddWithValue("@mext", 0);
+                    if (needDate) cmd.Parameters.AddWithValue("@dt", DateTime.Now);
+                    if (needModifiedDate) cmd.Parameters.AddWithValue("@mdt", DateTime.Now);
+                    if (needSize) cmd.Parameters.AddWithValue("@sz", 0);
+                    if (needDiarioAnalyzed) cmd.Parameters.AddWithValue("@dan", 0);
+                    if (needDiarioPrediction) cmd.Parameters.AddWithValue("@dpr", 0);
+                    if (needPath) cmd.Parameters.AddWithValue("@pth", "");
+
                     var affected = await cmd.ExecuteNonQueryAsync();
                     if (affected > 0) ins++; else dup++;
                 }

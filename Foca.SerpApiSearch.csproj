@@ -53,6 +53,7 @@
     <EmbeddedResource Include="img\export_csv.png" Condition="Exists('img\export_csv.png')" />
     <EmbeddedResource Include="img\copy.png" Condition="Exists('img\copy.png')" />
     <EmbeddedResource Include="img\connection.png" Condition="Exists('img\connection.png')" />
+    <EmbeddedResource Include="img\Search.png" Condition="Exists('img\Search.png')" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fody">
@@ -97,6 +98,7 @@
     <Compile Include="Search\QueryBuilder.cs" />
     <Compile Include="Search\ResultMapper.cs" />
     <Compile Include="Db\DbInserter.cs" />
+    <Compile Include="FocaInterop.cs" />
     <Compile Include="Ui\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>

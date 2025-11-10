@@ -205,7 +205,7 @@ namespace Foca.SerpApiSearch.Ui
             // chkUseBingDomainFilter
             // 
             this.chkUseBingDomainFilter.AutoSize = true;
-            this.chkUseBingDomainFilter.Location = new System.Drawing.Point(15, 223);
+            this.chkUseBingDomainFilter.Location = new System.Drawing.Point(15, 262);
             this.chkUseBingDomainFilter.Name = "chkUseBingDomainFilter";
             this.chkUseBingDomainFilter.Size = new System.Drawing.Size(209, 17);
             this.chkUseBingDomainFilter.TabIndex = 16;
@@ -215,7 +215,7 @@ namespace Foca.SerpApiSearch.Ui
             // chkDebugMode
             // 
             this.chkDebugMode.AutoSize = true;
-            this.chkDebugMode.Location = new System.Drawing.Point(15, 246);
+            this.chkDebugMode.Location = new System.Drawing.Point(15, 285);
             this.chkDebugMode.Name = "chkDebugMode";
             this.chkDebugMode.Size = new System.Drawing.Size(131, 17);
             this.chkDebugMode.TabIndex = 17;

@@ -9,7 +9,11 @@ using Foca.SerpApiSearch.Api;
 using Foca.SerpApiSearch.Config;
 using Foca.SerpApiSearch.Search;
 using Newtonsoft.Json.Linq;
+#pragma warning disable CS8019
+using Foca.SerpApiSearch.Db;
+#pragma warning restore CS8019
 #if FOCA_API
+using System.Reflection;
 using PluginsAPI;
 #endif
 
@@ -25,6 +29,8 @@ namespace Foca.SerpApiSearch.Ui
         {
             InitializeComponent();
         }
+
+
 
         private void SearchForm_Load(object sender, EventArgs e)
         {
@@ -53,10 +59,12 @@ namespace Foca.SerpApiSearch.Ui
                 panelHeader.Resize += PanelHeader_ResizeRepositionBuscar;
             }
             catch { }
-            // Icono: Buscar (img/search.png)
+            // Icono: Buscar (img/Search.png con fallback a img/search.png)
             try
             {
-                using (var stream = typeof(SearchForm).Assembly.GetManifestResourceStream("Foca.SerpApiSearch.img.search.png"))
+                var asm = typeof(SearchForm).Assembly;
+                using (var stream = asm.GetManifestResourceStream("Foca.SerpApiSearch.img.Search.png") ??
+                                   asm.GetManifestResourceStream("Foca.SerpApiSearch.img.search.png"))
                 {
                     if (stream != null)
                     {
@@ -497,7 +505,7 @@ namespace Foca.SerpApiSearch.Ui
 
                 // Resumen final alineado con Excel plugin (mensaje claro)
                 lblCount.Text = $"Se han encontrado {_results.Count} resultados";
-                ShowOnlyIncorporateCurrentProjectButton();
+                ShowDbImportButtons();
 #if FOCA_API
                 PluginLogger.Info($"Fin búsqueda {engine}. Resultados totales: {_results.Count}");
                 PluginLogger.Info("────────────────────────────────────────────────");
@@ -530,6 +538,24 @@ namespace Foca.SerpApiSearch.Ui
 
                 btnIncorporarNuevo.Visible = false;
                 btnExportar.Visible = false;
+                btnClose.Visible = false;
+            }
+            catch { }
+        }
+
+        private void ShowDbImportButtons()
+        {
+            try
+            {
+                btnIncorporarExistente.Text = "Insertar a un proyecto existente";
+                btnIncorporarExistente.Visible = true;
+                btnIncorporarExistente.Enabled = _results.Count > 0;
+
+                btnIncorporarNuevo.Text = "Insertar a un proyecto nuevo";
+                btnIncorporarNuevo.Visible = true;
+                btnIncorporarNuevo.Enabled = _results.Count > 0;
+
+                btnExportar.Visible = true;
                 btnClose.Visible = false;
             }
             catch { }
@@ -580,13 +606,13 @@ namespace Foca.SerpApiSearch.Ui
 
         private async void btnIncorporarExistente_Click(object sender, EventArgs e)
         {
-            await ImportUrlsToCurrentProjectAsync();
+            await InsertUrlsToExistingProjectViaDbAsync();
         }
 
         // Compatibilidad: el diseñador puede seguir apuntando a este manejador
         private async void btnIncorporarNuevo_Click(object sender, EventArgs e)
         {
-            await ImportUrlsToCurrentProjectAsync();
+            await InsertUrlsToNewProjectViaDbAsync();
         }
 
         private void btnExportar_Click(object sender, EventArgs e)
@@ -652,6 +678,128 @@ namespace Foca.SerpApiSearch.Ui
 #if FOCA_API
             PluginLogger.Progress(message);
 #endif
+        }
+
+        private async Task InsertUrlsToNewProjectViaDbAsync()
+        {
+            if (_results == null || _results.Count == 0)
+            {
+                MessageBox.Show("No hay resultados que insertar.", "Nuevo proyecto", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var dlg = new NewProjectForm())
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+                try
+                {
+                    var inserter = new DbInserter();
+                    var domain = QueryBuilder.NormalizeToDomain(txtRootUrl.Text);
+                    var newProjectId = await inserter.CreateProjectAsync(dlg.ProjectName, dlg.ProjectNotes, domain);
+                    var (inserted, duplicates) = await inserter.InsertUrlsAsync(newProjectId, _results.ToArray());
+
+                    MessageBox.Show(
+                        $"Proyecto creado (Id={newProjectId}). Insertadas {inserted} URL(s). Duplicadas: {duplicates}.",
+                        "Nuevo proyecto",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    // Recarga silenciosa en FOCA
+#if FOCA_API
+                    try
+                    {
+                        FocaInterop.TryLoadProjectById(newProjectId);
+                        FocaInterop.TryRefreshProjectsList();
+                        // Encolar descargas para fijar tamaño y dejar lista la extracción
+                        FocaInterop.TryEnqueueDownloadsForUrls(_results);
+                        FocaInterop.TryFinalizeUrls(_results);
+                        // Reparar 0 KB si persisten tras descarga
+                        FocaInterop.FixZeroSizeDownloadsAsync(_results, 3, 3000);
+                    }
+                    catch { }
+#endif
+
+                    FinalizeAfterImportUI();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"No se pudo crear el proyecto o insertar las URLs: {ex.Message}", "Nuevo proyecto", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private async Task InsertUrlsToExistingProjectViaDbAsync()
+        {
+            if (_results == null || _results.Count == 0)
+            {
+                MessageBox.Show("No hay resultados que insertar.", "Proyecto existente", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var dlg = new SelectProjectForm())
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                var project = dlg.SelectedProject;
+                if (project == null)
+                {
+                    MessageBox.Show("Debes seleccionar un proyecto.", "Proyecto existente", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                try
+                {
+                    var inserter = new DbInserter();
+                    var (inserted, duplicates) = await inserter.InsertUrlsAsync(project.Id, _results.ToArray());
+
+                    MessageBox.Show(
+                        $"Insertadas {inserted} URL(s) en '{project.Name}' (Id={project.Id}). Duplicadas: {duplicates}.",
+                        "Proyecto existente",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    // Recarga silenciosa en FOCA
+#if FOCA_API
+                    try
+                    {
+                        FocaInterop.TryReloadCurrentProject();
+                        FocaInterop.TryRefreshProjectsList();
+                        // Encolar descargas para fijar tamaño y dejar lista la extracción
+                        FocaInterop.TryEnqueueDownloadsForUrls(_results);
+                        FocaInterop.TryFinalizeUrls(_results);
+                        // Reparar 0 KB si persisten tras descarga
+                        FocaInterop.FixZeroSizeDownloadsAsync(_results, 3, 3000);
+                    }
+                    catch { }
+#endif
+
+                    FinalizeAfterImportUI();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"No se pudo insertar en el proyecto: {ex.Message}", "Proyecto existente", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private static List<Uri> BuildUriList(IEnumerable<string> urls)
+        {
+            var data = new List<Uri>();
+
+            if (urls == null)
+            {
+                return data;
+            }
+
+            foreach (var url in urls)
+            {
+                if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                {
+                    data.Add(uri);
+                }
+            }
+
+            return data;
         }
     }
 }
