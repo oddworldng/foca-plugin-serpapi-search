@@ -105,16 +105,52 @@ namespace Foca.SerpApiSearch.Search
 
         public static string BuildBing(string domain, IEnumerable<string> extensions)
         {
-            var d = NormalizeToDomain(domain);
+            // Sanitización básica de la entrada (recortar, quitar comillas sueltas y normalizar a minúsculas)
+            string input = domain ?? string.Empty;
+            input = input.Trim().Trim('\"', '\'');
+            var d = (NormalizeToDomain(input) ?? string.Empty).Trim().Trim('\"', '\'').ToLowerInvariant();
+
             var list = (extensions ?? Enumerable.Empty<string>()).Where(e => !string.IsNullOrWhiteSpace(e))
                 .Select(e => e.Trim().ToLower()).Distinct().ToList();
             var parts = new List<string>();
 
-            if (!string.IsNullOrWhiteSpace(d)) parts.Add($"site:\"{d}\"");
+            // Construcción de site: robusta para apex vs www.
+            // - Si host = apex (dos labels), usar (apex OR www.apex)
+            // - Si host = www.apex, usar (apex OR www.apex)
+            // - Si host = subdominio.apex distinto a www, usar solo ese subdominio (no ampliar)
+            if (!string.IsNullOrWhiteSpace(d))
+            {
+                var labels = d.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                if (labels.Length >= 2)
+                {
+                    bool isWww = labels[0].Equals("www", StringComparison.OrdinalIgnoreCase);
+                    if (isWww && labels.Length >= 3)
+                    {
+                        // www.apex.tld → usar exactamente www.apex.tld
+                        parts.Add($"site:\"{d}\"");
+                    }
+                    else if (!isWww && labels.Length == 2)
+                    {
+                        // apex.tld → (apex.tld OR www.apex.tld)
+                        var apex = d;
+                        var www = "www." + d;
+                        parts.Add($"(site:\"{apex}\" OR site:\"{www}\")");
+                    }
+                    else
+                    {
+                        // subdominio distinto de www → usar tal cual
+                        parts.Add($"site:\"{d}\"");
+                    }
+                }
+                else
+                {
+                    parts.Add($"site:\"{d}\"");
+                }
+            }
 
             try
             {
-                var segs = GetPathSegments(domain);
+                var segs = GetPathSegments(input);
                 if (segs.Count > 0)
                 {
                     foreach (var seg in segs)

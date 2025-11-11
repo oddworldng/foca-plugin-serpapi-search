@@ -95,6 +95,7 @@
     <Compile Include="Config\SerpApiSettings.cs" />
     <Compile Include="Config\SerpApiConfigStore.cs" />
     <Compile Include="Api\SerpApiClient.cs" />
+    <Compile Include="Api\BingSimpleClient.cs" />
     <Compile Include="Search\QueryBuilder.cs" />
     <Compile Include="Search\ResultMapper.cs" />
     <Compile Include="Db\DbInserter.cs" />

@@ -9,13 +9,12 @@ Resumen de uso rápido
 Motores soportados
 - DuckDuckGo (paginación con pageno).
 - Google (paginación con start, soporte de google_domain, hl/gl automapeados desde kl).
-- Bing (paginación con first/count; `kl` opcional en formato lang-cc → `setlang`/`cc`; además `mkt=lang-COUNTRY` y `safe_search=Off`. Se refuerza el dork con `site:`/`inurl:` y, de forma opcional (activada por defecto en la configuración), se añade `filters=domain:<host>` a la petición de SerpApi. Se usa `async=true` + sondeo del endpoint hasta `Success/Cached` para evitar timeouts y se permite caché). 
+- Bing (engine=bing: paginación `first/count` y/o `serpapi_pagination.next`; parámetros soportados: `q`, `setlang`, `cc`, `mkt`, `first`, `count`, `safe_search`, `device`. El dork se construye con `site:`/`inurl:` y `filetype:`; el filtrado por dominio/ruta/extensión se realiza en cliente. No se usa `filters=domain`). 
 
 Configuración (App.config)
-- `SerpApiTimeoutSeconds`: recomendado 90 para Bing async.
-- `SerpApiBingAsyncPollingIntervalMs` (opcional): intervalo de sondeo, por defecto 1500 ms.
-- `SerpApiBingAsyncMaxWaitMs` (opcional): ventana máxima de sondeo, por defecto 180000 ms.
-- Opción "Aplicar filtro domain= en búsquedas Bing" (configuración del plugin / `config.json`): permite desactivar `filters=domain` si se necesita relajar el filtro.
+- `SerpApiTimeoutSeconds`: tiempo de espera HTTP para SerpApi.
+- (ya no se usa modo async/polling para Bing).
+- Opción "Aplicar filtro domain= en búsquedas Bing" (configuración del plugin / `config.json`): ya no se envía `filters=domain`; el filtrado se realiza en cliente.
 
 Estrategia de integración con FOCA (URLs → Proyecto)
 

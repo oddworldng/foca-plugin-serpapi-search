@@ -325,10 +325,6 @@ namespace Foca.SerpApiSearch.Ui
                 PluginLogger.Info($"Google domain: {gDomain} | asFiletype: {asFiletype ?? "-"}");
                 PluginLogger.Info($"API Key origen: {keySource}");
                 PluginLogger.Info($"Límites configuración → MaxResults={maxResults} | MaxPages={maxPages} | MaxRequests={maxRequests} | DelayBetweenPagesMs={delayMs}");
-                if (string.Equals(engine, "Bing", StringComparison.OrdinalIgnoreCase))
-                {
-                    PluginLogger.Info($"Bing filters=domain habilitado: {(applyBingDomainFilter ? "Sí" : "No")}");
-                }
                 PluginLogger.Info($"Consulta enviada: {query}");
 #endif
 
@@ -356,20 +352,135 @@ namespace Foca.SerpApiSearch.Ui
                         }
                         else if (engine == "Bing")
                         {
-                            // Bing usa setlang/cc y paginación con 'first'
-                            int first = page * 10;
-                            // Primera página rápida: count=5 y, si no se indicó kl, omitir setlang/cc
-                            int count = (page == 0 ? 5 : 10);
-                            string sl = setlang, country = cc;
-                            if (page == 0 && string.IsNullOrWhiteSpace(txtKl.Text))
+                            // Nuevo flujo: cliente simple para Bing (sin async polling ni filters=domain)
+                            using (var bclient = new BingSimpleClient())
                             {
-                                sl = null;
-                                country = null;
-                            }
+                                int first = page * 10;
+                                int count = 10;
+                                string sl = setlang, country = cc;
+                                if (page == 0 && string.IsNullOrWhiteSpace(txtKl.Text))
+                                {
+                                    sl = null;
+                                    country = null;
+                                }
 #if FOCA_API
-                            PluginLogger.Info($"Bing: solicitando página {page + 1} (first={first}, count={count})");
+                                PluginLogger.Info($"Bing(simple): solicitando página {page + 1} (first={first}, count={count})");
 #endif
-                            res = await client.SearchBingAsync(apiKey, query, sl, country, first, host, applyBingDomainFilter, ct, count, UpdateBingStatus);
+                                try { lblCount.Text = $"Bing: solicitando página {page + 1}…"; } catch { }
+                                await Task.Yield();
+                                var resB = await bclient.SearchPageAsync(apiKey, query, first, count, sl, country, ct, UpdateBingStatus);
+                                if (!resB.ok)
+                                {
+                                    MessageBox.Show(resB.error ?? "Error de búsqueda (Bing)", "Búsqueda avanzada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+#if FOCA_API
+                                    PluginLogger.Error($"Bing(simple): error en página {page + 1}: {resB.error ?? "Error de búsqueda"}");
+#endif
+                                    break;
+                                }
+
+                                var jsonB = resB.json;
+                                var (bingLinksList, nextUrl) = BingSimpleClient.ExtractLinksAndNext(jsonB, host);
+                                var bingPageLinks = (bingLinksList ?? Enumerable.Empty<string>()).ToList();
+                                bool bingIsLastPage = string.IsNullOrWhiteSpace(nextUrl);
+
+                                // No hay reintento con filters=domain (no aplicable a Bing en SerpApi)
+
+                                IEnumerable<string> bingFilteredLinks;
+                                int bingSkippedDomain = 0;
+                                int bingSkippedPath = 0;
+
+                                // Filtrar por dominio exacto y ruta (no enviamos filters=domain a SerpApi en este primer intento si está desactivado)
+                                bingFilteredLinks = bingPageLinks
+                                    .Where(u =>
+                                    {
+                                        var passDomain = QueryBuilder.IsUrlInDomain(u, domain);
+                                        if (!passDomain) bingSkippedDomain++;
+                                        return passDomain;
+                                    })
+                                    .ToList();
+
+                                var bingLinks = bingFilteredLinks
+                                    .Where(u =>
+                                    {
+                                        var passPath = QueryBuilder.UrlPathContainsSegments(u, pathSegs, true);
+                                        if (!passPath) bingSkippedPath++;
+                                        return passPath;
+                                    })
+                                    .ToList();
+
+                                int addedThisBingPage = 0;
+                                foreach (var link in bingLinks)
+                                {
+#if FOCA_API
+                                    string hostInfo = null;
+                                    bool inDomain = false;
+                                    bool pathOk = false;
+                                    try
+                                    {
+                                        var uri = new Uri(link);
+                                        hostInfo = uri.Host;
+                                        inDomain = QueryBuilder.IsUrlInDomain(link, domain);
+                                        pathOk = QueryBuilder.UrlPathContainsSegments(link, pathSegs, true);
+                                    }
+                                    catch
+                                    {
+                                        hostInfo = "(invalid uri)";
+                                    }
+                                    PluginLogger.Debug($"Filtro enlace: {link}");
+                                    PluginLogger.Debug($"    host={hostInfo} inDomain={inDomain} pathOk={pathOk}");
+#endif
+                                    // Filtro por extensiones
+                                    bool allowedExt = (selectedExts == null || selectedExts.Length == 0);
+                                    if (!allowedExt)
+                                    {
+                                        try
+                                        {
+                                            var path = new Uri(link).AbsolutePath.ToLowerInvariant();
+                                            foreach (var ext in selectedExts)
+                                            {
+                                                var e = (ext ?? string.Empty).ToLowerInvariant();
+                                                if (!string.IsNullOrEmpty(e) && path.EndsWith("." + e))
+                                                {
+                                                    allowedExt = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            allowedExt = false;
+                                        }
+                                    }
+                                    if (!allowedExt)
+                                    {
+#if FOCA_API
+                                        PluginLogger.Debug($"Descartado por extensión: {link}");
+#endif
+                                        continue;
+                                    }
+
+                                    if (seen.Add(link))
+                                    {
+                                        _results.Add(link);
+                                        lstResults.Items.Add(link);
+                                        addedThisBingPage++;
+                                        if (maxResults > 0 && _results.Count >= maxResults) break;
+                                    }
+                                }
+
+                                // Sin reintento adicional por dominio: no aplicable en Bing (SerpApi)
+
+                                lblCount.Text = _results.Count + " resultados";
+                                await Task.Yield();
+#if FOCA_API
+                                PluginLogger.Debug($"Bing(simple): página {page + 1} → enlaces={bingPageLinks.Count}, añadidos={addedThisBingPage}, total={_results.Count}, última={bingIsLastPage}");
+                                PluginLogger.Debug($"Bing(simple): descartados dominio={bingSkippedDomain}, descartados ruta={bingSkippedPath}");
+#endif
+                                if (addedThisBingPage == 0) break;
+                                if (bingIsLastPage) break;
+                                if (delayMs > 0) await Task.Delay(delayMs, ct);
+                                continue; // saltar el pipeline genérico (Google/DDG)
+                            }
                         }
                         else
                         {
